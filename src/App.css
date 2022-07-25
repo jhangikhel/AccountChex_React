@@ -1,0 +1,123 @@
+body {
+  background: #f5f5f5;
+}
+
+a {
+  color: #049ab8;
+}
+
+.textBlack {
+  color: #222;
+}
+
+.gradientbg {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  width: 100%;
+  background: #a1f8f2;
+  background: -moz-linear-gradient(
+    -45deg,
+    #a1f8f2 0%,
+    #a9c6fb 33%,
+    #b7d7fb 75%,
+    #d8fefa 100%
+  );
+  background: -webkit-linear-gradient(
+    -45deg,
+    #a1f8f2 0%,
+    #a9c6fb 33%,
+    #b7d7fb 75%,
+    #d8fefa 100%
+  );
+  background: linear-gradient(
+    135deg,
+    #a1f8f2 0%,
+    #a9c6fb 33%,
+    #b7d7fb 75%,
+    #d8fefa 100%
+  );
+  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#a1f8f2', endColorstr='#d8fefa',GradientType=1 );
+}
+
+.errorMsg {
+  font-size: 12px;
+  color: #f00;
+  width: 100%;
+  text-align: center;
+  background: rgb(245 218 218);
+  padding: 5px 15px;
+  text-transform: capitalize;
+  border-radius: 3px;
+  border: 1px #f00 solid;
+}
+
+.successMsg {
+  font-size: 12px;
+  color: #8bc34a;
+  width: 100%;
+  text-align: center;
+  background: rgb(228 251 201 / 45%);
+  padding: 5px 15px;
+  text-transform: capitalize;
+  border-radius: 3px;
+  border: 1px #8bc34a solid;
+}
+
+/* login box css */
+
+.loginHolder {
+  padding: 40px 40px;
+  background: #fff;
+  max-width: 450px;
+  width: 100%;
+  text-align: center;
+  border-radius: 4px;
+}
+
+.loginHolder h2 {
+  margin-top: 30px;
+  font-size: 1.5rem;
+  text-transform: uppercase;
+  font-weight: 500;
+  margin-bottom: 30px;
+}
+
+.breadcrumbsHolder {
+  background: #fff;
+  margin-bottom: 10px;
+  padding: 12px 16px 16px;
+}
+
+.pageTitle {
+  font-size: 22px;
+  line-height: 30px;
+  margin-bottom: 0px;
+  color: #444;
+}
+
+.formBtnHolder {
+  padding: 30px 0px;
+}
+
+.MuiTableCell-stickyHeader {
+  background-color: #dedede !important;
+}
+
+.tableHolder {
+  box-shadow: none;
+  border: 1px #ddd solid;
+}
+
+button:focus {
+  outline: none !important;
+}
+
+@media screen and (max-width: 767px) {
+  .loginHolder {
+    padding: 20px 20px;
+
+    max-width: 80%;
+  }
+}
