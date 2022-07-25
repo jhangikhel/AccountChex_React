@@ -214,7 +214,7 @@ export default function AddVendor(props) {
     setSnackbar(false);
 }; 
 
-  return vendors.length === 0 ? <LoadingPage></LoadingPage> : (
+  return vendors.length !== 0 ? <LoadingPage></LoadingPage> : (
     <React.Fragment>
       <Grid container spacing={2}>
         <Grid item xs={12} sm={12} md={6} lg={4}>

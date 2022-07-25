@@ -94,6 +94,13 @@ export default function Login() {
     }
 
     setError({ account, error: error });
+    if (result === true) {
+      if (email === "admin" && password === "admin") {
+        history.push("/createproject");
+      } else {
+        setErrorMsg("Invalid User name and password");
+      }
+    }
     /* if (result === true) {
       httpService
         .post("/login", {
@@ -117,9 +124,7 @@ export default function Login() {
           pageName="Forgot Password?"
         >
           <form className={classes.form} noValidate>
-            {errorMsg &&
-              <p className="errorMsg">{errorMsg}</p>
-            }
+            {errorMsg && <p className="errorMsg">{errorMsg}</p>}
             <Grid item xs={12} md={12} lg={12}>
               <TextField
                 fullWidth

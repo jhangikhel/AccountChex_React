@@ -247,7 +247,7 @@ export default function AddTimesheet(props) {
   const closeSnackbar = () => {
     setSnackbar(false);
 }; 
-  return vendors.length === 0 ? <LoadingPage></LoadingPage> : (
+  return vendors.length !== 0 ? <LoadingPage></LoadingPage> : (
     <React.Fragment>
       <Grid container spacing={2}>
       <Grid item xs={6} sm={6} md={3} lg={2}>
