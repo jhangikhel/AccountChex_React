@@ -97,7 +97,7 @@ export const menuBar = [
     //{id:1,pageName:PAGE_NAME.dashboard,pagePath:PAGE_PATH.dashboard},
     { id: 2, pageName: PAGE_NAME.createEmployee, pagePath: PAGE_PATH.createEmployee, isMenuBar: true },
     { id: 3, pageName: PAGE_NAME.createProject, pagePath: PAGE_PATH.createProject, isMenuBar: true },
-    { id: 4, pageName: PAGE_NAME.createVendor, pagePath: PAGE_PATH.createVendor, isMenuBar: true },
+    { id: 4, pageName: PAGE_NAME.vendor, pagePath: PAGE_PATH.vendor, isMenuBar: true },
     { id: 5, pageName: PAGE_NAME.createClient, pagePath: PAGE_PATH.createClient, isMenuBar: true },
     { id: 10, pageName: PAGE_NAME.createTimesheet, pagePath: PAGE_PATH.createTimesheet, isMenuBar: true },
     { id: 11, pageName: PAGE_NAME.createTimesheet, pagePath: PAGE_PATH.createTimesheet, isMenuBar: false },

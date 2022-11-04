@@ -278,7 +278,7 @@ export default function AddClient(props) {
             margin="normal"
             fullWidth
             id="boardNumber"
-            label="Board Number"
+            label="Client ID"
             name="boardNumber"
             error={!stateObj.error.boardNumber.errorObject.isValid}
             helperText={
@@ -410,7 +410,6 @@ export default function AddClient(props) {
           inputProps={{
             maxLength: 50,
           }}
-          autoFocus
         />
       </Grid>
     </Grid>

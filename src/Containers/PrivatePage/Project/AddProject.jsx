@@ -703,7 +703,6 @@ export default function AddProject(props) {
             inputProps={{
                 maxLength: 500,
             }}
-            autoFocus
           />
         </Grid>
    </Grid>

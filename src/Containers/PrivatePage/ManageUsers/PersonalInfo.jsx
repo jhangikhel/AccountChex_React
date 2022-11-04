@@ -240,7 +240,7 @@ export default function PersonalInfo(props) {
       props.setPersonalInfo("panel1", account, result);
     }
   };
-  return gender.length === 0 ? <LoadingPage></LoadingPage> : (
+  return gender.length !== 0 ? <LoadingPage></LoadingPage> : (
 
     <div>
       <Grid container spacing={2}>

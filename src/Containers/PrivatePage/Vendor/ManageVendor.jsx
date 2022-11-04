@@ -2,32 +2,38 @@ import React, { useEffect } from "react";
 import PropTypes from "prop-types";
 import { makeStyles, useTheme } from "@material-ui/core/styles";
 import {
-  Table, TableBody, TableCell, TableContainer, TablePagination, TableRow, Paper, IconButton, TableHead,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TablePagination,
+  TableRow,
+  Paper,
+  IconButton,
+  TableHead,
   Collapse,
   Box,
   Typography,
   Grid,
   Button,
 } from "@material-ui/core";
-import {
-  FirstPageIcon, LastPageIcon, KeyboardArrowLeft, KeyboardArrowRight,
-  KeyboardArrowDownIcon, KeyboardArrowUpIcon
-} from "@material-ui/icons/FirstPage";
+import { FirstPageIcon } from "@material-ui/icons/FirstPage";
 import { fillTemplate } from "../../../Shared/index";
 import { API_PATH } from "../../../Constants/config";
 import httpService from "../../../API/HttpService/httpService";
 import FullWidthTabs from "../../../Components/TabPanel";
-import { useHistory } from 'react-router-dom';
+import { useHistory } from "react-router-dom";
 import { snackbarMessages } from "../../../Constants/errorMessage";
-import CustomizedSnackbars from './../../../Components/CustomizedSnackbars';
-import { ModalPopup } from './../../../Components/Control/ModalPopup';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import {
-  faTrash, faEdit
-} from "@fortawesome/free-solid-svg-icons";
+import CustomizedSnackbars from "./../../../Components/CustomizedSnackbars";
+import { ModalPopup } from "./../../../Components/Control/ModalPopup";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faTrash, faEdit } from "@fortawesome/free-solid-svg-icons";
 import AddIcon from "@material-ui/icons/Add";
-import LoadingPage from './../../../Components/Control/LoadingPage';
+import LoadingPage from "./../../../Components/Control/LoadingPage";
 import { VendorTabsName } from "../ManageUsers/EmployeeTabs/EmployeeTabsDetails";
+import KeyboardArrowUpIcon from "@material-ui/icons/KeyboardArrowUp";
+import KeyboardArrowDownIcon from "@material-ui/icons/KeyboardArrowDown";
+import moment from "moment";
 const useStyles1 = makeStyles((theme) => ({
   root: {
     flexShrink: 0,
@@ -77,8 +83,8 @@ function TablePaginationActions(props) {
         {theme.direction === "rtl" ? (
           <KeyboardArrowRight />
         ) : (
-            <KeyboardArrowLeft />
-          )}
+          <KeyboardArrowLeft />
+        )}
       </IconButton>
       <IconButton
         onClick={handleNextButtonClick}
@@ -88,8 +94,8 @@ function TablePaginationActions(props) {
         {theme.direction === "rtl" ? (
           <KeyboardArrowLeft />
         ) : (
-            <KeyboardArrowRight />
-          )}
+          <KeyboardArrowRight />
+        )}
       </IconButton>
       <IconButton
         onClick={handleLastPageButtonClick}
@@ -120,15 +126,17 @@ export default function ManageVendor() {
   const history = useHistory();
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
-  const [rows, setRowData] = React.useState([]);
+  const [rows, setRowData] = React.useState(null);
   const [popup, setPopup] = React.useState(false);
   const [deleteId, setDeleteId] = React.useState(0);
   const [snackbar, setSnackbar] = React.useState(false);
   const [message, setMessage] = React.useState(snackbarMessages.deleteSuccess);
   const [projectName, setProjectName] = React.useState("");
-  const [isReload, setReload] = React.useState(true);
   const [selectedRowIndex, setselectedRowIndex] = React.useState(-1);
   const [selectedVendorId, setselectedVendorId] = React.useState(0);
+  const [take, setTake] = React.useState(5);
+  const [skip, setSkip] = React.useState(0);
+  const [totalRecords, setTotalRecords] = React.useState(0);
   const openExpansionAndSetVendorId = (rowIndex, vendorId) => {
     if (selectedRowIndex === rowIndex) {
       rowIndex = -1;
@@ -137,26 +145,31 @@ export default function ManageVendor() {
     setselectedRowIndex(rowIndex);
 
     setselectedVendorId(vendorId);
-  }
+  };
   const handleClickOpen = (id, name) => {
+    setPopup(true);
     setProjectName(name);
     setDeleteId(id);
-    setPopup(true);
   };
 
   const deleteProject = () => {
     httpService
       .delete(`${API_PATH.DELETE_VENDOR}${deleteId}`)
-      .then((res) => {
-        setMessage(snackbarMessages.deleteSuccess);
+      .then(() => {
+        setRowData([]);
+        setSkip(0);
+        setPopup(false);
+        setTotalRecords(0);
+        setMessage("Vendor Succssfully Deleted");
         setSnackbar(true);
-        setReload(true);
-      }).catch(err => {
+        getVendors();
+      })
+      .catch((err) => {
         setMessage(snackbarMessages.deleteError);
         setSnackbar(true);
+        setPopup(false);
       });
-    setPopup(false);
-  }
+  };
 
   const closeSnackbar = () => {
     setSnackbar(false);
@@ -165,34 +178,37 @@ export default function ManageVendor() {
   const cancelHandlePopup = () => {
     setPopup(false);
   };
-  const emptyRows =
-    rowsPerPage - Math.min(rowsPerPage, rows.length - page * rowsPerPage);
-  const userId = 1;
-  let fillTemp = fillTemplate(API_PATH.GET_VENDORS, "organizationId");
 
+  const getVendors = () => {
+    const apiPath = API_PATH.GET_VENDORS;
+    httpService.get(`${apiPath}?take=${take}&skip=${skip}`).then((res) => {
+      setRowData(res.data.data);
+      setTotalRecords(res.data.count);
+    });
+  };
   useEffect(() => {
-    if (isReload === true) {
-      const apiPath = fillTemp(userId);
-      httpService.get(apiPath).then((res) => {
-        setRowData(res.data);
-        setReload(false);
-      });
-    }
-  }, [isReload]);
+    getVendors();
+  }, [skip]);
 
   const handleChangePage = (event, newPage) => {
+    console.log(newPage);
     setPage(newPage);
+    setSkip(newPage * take);
   };
 
   const onCreateHandler = () => {
-    history.push('/createvendor');
+    history.push("/createvendor");
   };
   const handleChangeRowsPerPage = (event) => {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
   };
-  const tableObj = [{ title: 'Project Name', proopName: 'project_name' }];
-  return rows.length === 0 ? <LoadingPage></LoadingPage> : (
+  const tableObj = [{ title: "Project Name", proopName: "project_name" }];
+
+  console.log(rows);
+  return rows === null ? (
+    <LoadingPage></LoadingPage>
+  ) : (
     <div>
       <Grid container spacing={2}>
         <Grid item xs={12} style={{ textAlign: "right" }}>
@@ -203,8 +219,8 @@ export default function ManageVendor() {
             onClick={onCreateHandler}
           >
             <AddIcon style={{ marginRight: "5px", marginLeft: "-5px" }} /> Add
-              Vendor
-            </Button>
+            Vendor
+          </Button>
         </Grid>
         <Grid item xs={12}>
           <TableContainer component={Paper}>
@@ -214,8 +230,14 @@ export default function ManageVendor() {
             >
               <TableHead>
                 <TableRow>
-                  <TableCell component="th" width="10px" scope="row"></TableCell>
-                  <TableCell component="th" scope="row">Action</TableCell>
+                  <TableCell
+                    component="th"
+                    width="10px"
+                    scope="row"
+                  ></TableCell>
+                  <TableCell component="th" scope="row">
+                    Action
+                  </TableCell>
                   {/* {tableObj.map(({ title }) => <TableCell component="th" scope="row">{title}</TableCell>)} */}
                   <TableCell component="th" scope="row">
                     Name
@@ -244,10 +266,121 @@ export default function ManageVendor() {
                   <TableCell component="th" scope="row">
                     Zipcode
                   </TableCell>
-
+                  <TableCell component="th" scope="row">
+                    Created By
+                  </TableCell>
+                  <TableCell component="th" scope="row">
+                    Updated By
+                  </TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
+                {(rowsPerPage > 0
+                  ? rows.slice(
+                      page * rowsPerPage,
+                      page * rowsPerPage + rowsPerPage
+                    )
+                  : rows
+                ).map((row, idx) => (
+                  <React.Fragment key={row.id}>
+                    <TableRow>
+                      <TableCell>
+                        <IconButton
+                          aria-label="expand row"
+                          size="small"
+                          onClick={() =>
+                            openExpansionAndSetVendorId(idx, row.id)
+                          }
+                        >
+                          {selectedRowIndex === idx ? (
+                            <KeyboardArrowUpIcon />
+                          ) : (
+                            <KeyboardArrowDownIcon />
+                          )}
+                          {/* */}
+                        </IconButton>
+                      </TableCell>
+                      <TableCell>
+                        <IconButton
+                          aria-label="delete row"
+                          size="small"
+                          onClick={() => handleClickOpen(row.id, row.name)}
+                        >
+                          <FontAwesomeIcon icon={faTrash} />
+                        </IconButton>
+                        <IconButton aria-label="edit row" size="small">
+                          <FontAwesomeIcon icon={faEdit} />
+                        </IconButton>
+                      </TableCell>
+
+                      <TableCell scope="row">{row.name}</TableCell>
+                      <TableCell scope="row">
+                        {row.parent && row.parent.name}
+                      </TableCell>
+                      <TableCell scope="row">{row.emailId}</TableCell>
+                      <TableCell scope="row">{row.websiteUrl}</TableCell>
+                      <TableCell>{`${
+                        row.address1 != null ? row.address1 : ""
+                      } ${
+                        row.address2 != null ? row.address2 : ""
+                      }`}</TableCell>
+                      <TableCell>{`${row.country.name}`}</TableCell>
+                      <TableCell>{`${row.state.name}`}</TableCell>
+                      <TableCell>{`${row.city.name}`}</TableCell>
+                      <TableCell>{row.zipCode}</TableCell>
+                      <TableCell>{row.account.name}</TableCell>
+                      <TableCell>
+                        {moment(row.creationTime).isValid() &&
+                          moment(row.creationTime).format(
+                            "MM-DD-yyyy hh:mm:ss A"
+                          )}
+                      </TableCell>
+                    </TableRow>
+                    {totalRecords === idx + 1 && (
+                      <TableRow>
+                        <TablePagination
+                          rowsPerPageOptions={[
+                            10,
+                            25,
+                            { label: "All", value: -1 },
+                          ]}
+                          colSpan={13}
+                          count={totalRecords}
+                          rowsPerPage={rowsPerPage}
+                          page={page}
+                          SelectProps={{
+                            inputProps: { "aria-label": "rows per page" },
+                            native: true,
+                          }}
+                          onChangePage={handleChangePage}
+                          onChangeRowsPerPage={handleChangeRowsPerPage}
+                          //ActionsComponent={TablePaginationActions}
+                        />
+                      </TableRow>
+                    )}
+                    {selectedRowIndex === idx && (
+                      <TableRow key={idx}>
+                        <TableCell
+                          style={{ paddingBottom: 0, paddingTop: 0 }}
+                          colSpan={12}
+                        >
+                          <Collapse in={open} timeout="auto" unmountOnExit>
+                            <Box margin={1}>
+                              <Typography variant="h6" gutterBottom>
+                                <FullWidthTabs
+                                  tabs={VendorTabsName}
+                                  vendorId={selectedVendorId}
+                                ></FullWidthTabs>
+                              </Typography>
+                            </Box>
+                          </Collapse>
+                        </TableCell>
+                      </TableRow>
+                    )}
+                  </React.Fragment>
+                ))}
+              </TableBody>
+              {/*    <TableBody>
                 {(rowsPerPage > 0
                   ? rows.slice(
                     page * rowsPerPage,
@@ -267,24 +400,8 @@ export default function ManageVendor() {
                             )}
                         </IconButton>
                       </TableCell>
-                      <TableCell>
-                        <IconButton aria-label="delete row" size="small" onClick={() => handleClickOpen(row.id, row.name)}>
-                          <FontAwesomeIcon icon={faTrash} />
-                        </IconButton>
-                        <IconButton aria-label="edit row" size="small">
-                          <FontAwesomeIcon icon={faEdit} />
-                        </IconButton>
-                      </TableCell>
-                      {/* {tableObj.map(({ proopName }) =>  <TableCell scope="row">{row[proopName]}</TableCell>)} */}
-                      <TableCell scope="row">{row.name}</TableCell>
-                      <TableCell scope="row">{row.vendor_1}</TableCell>
-                      <TableCell scope="row">{row.email_id}</TableCell>
-                      <TableCell scope="row">{row.website_url}</TableCell>
-                      <TableCell>{`${row.address_1 != null ? row.address_1 : ""} ${row.address_2 != null ? row.address_2 : ""}`}</TableCell>
-                      <TableCell>{`${row.country}`}</TableCell>
-                      <TableCell>{`${row.state}`}</TableCell>
-                      <TableCell>{`${row.city}`}</TableCell>
-                      <TableCell>{row.zip_code}</TableCell>
+                    
+                   
                     </TableRow>
                     { selectedRowIndex === idx &&
                       <TableRow key={idx}>
@@ -309,31 +426,23 @@ export default function ManageVendor() {
                 ))}
 
 
-              </TableBody>
-              <TablePagination
-                rowsPerPageOptions={[
-                  10,
-                  25,
-                  { label: "All", value: -1 },
-                ]}
-                colSpan={13}
-                count={rows.length}
-                rowsPerPage={rowsPerPage}
-                page={page}
-                SelectProps={{
-                  inputProps: { "aria-label": "rows per page" },
-                  native: true,
-                }}
-                onChangePage={handleChangePage}
-                onChangeRowsPerPage={handleChangeRowsPerPage}
-                ActionsComponent={TablePaginationActions}
-              />
+              </TableBody>*/}
+              {/* */}
             </Table>
           </TableContainer>
         </Grid>
       </Grid>
-      <CustomizedSnackbars open={snackbar} closeSnackbar={closeSnackbar} message={message} />
-      <ModalPopup isPopupOpen={popup} cancelHandlePopup={cancelHandlePopup} submitHandlePopup={deleteProject} deleteName={projectName}></ModalPopup>
+      <CustomizedSnackbars
+        open={snackbar}
+        closeSnackbar={closeSnackbar}
+        message={message}
+      />
+      <ModalPopup
+        isPopupOpen={popup}
+        cancelHandlePopup={cancelHandlePopup}
+        submitHandlePopup={deleteProject}
+        deleteName={projectName}
+      ></ModalPopup>
     </div>
   );
 }

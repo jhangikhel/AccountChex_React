@@ -1,6 +1,6 @@
 export const WEB_URL = "https://material-ui.com/";
 
-export const WEB_API_URL = "http://198.74.52.242:4001/";
+export const WEB_API_URL = "http://45.56.125.158:3000";
 export const WEBSITE_NAME = 'Account Chex';
 //Page Path
 export const PAGE_PATH = {
@@ -37,7 +37,10 @@ export const PAGE_NAME = {
 }
 //API PATH
 export const API_PATH = {
-    GET_COUNTRY: '/dropdown/country',
+    GET_COUNTRY: '/country',
+    GET_PARENT_VENDOR: '/vendor/parent',
+    GET_STATE: '/state',
+    GET_CITY: '/city',
     GET_BILLING_STATUS: '/dropdown/employee?downType=GET_STATUS',
     GET_TAX_TYPE: '/dropdown/employee?downType=GET_TAX_TYPE',
     GET_WORK_AUTHORIZATION: '/dropdown/employee?downType=GET_WORK_AUTHORIZATION',
@@ -46,15 +49,15 @@ export const API_PATH = {
     GET_WAGE_CYCLE: '/dropdown/employee?downType=GET_WAGE_CYCLE',
     GET_CLIENT_BY_VENDOR_ID: 'dropdown/client?vendorId=',
     GET_GENDER: '/dropdown/employee?downType=GET_GENDER',
-    GET_STATE: '/dropdown/state?countryId=',
-    GET_CITY: '/dropdown/city?stateId=',
+ 
+    
     GET_REPORTINGTO: '/dropdown/reportingto?organizationId=1&departmentId=',
     GET_VENDOR: 'dropdown/vendor?accountId=',
     GET_PROJECT: '/dropdown/project?vendorId=',
     GET_DRAFT_EMPLOYEE: 'employee?userId=${userId}&isDraft=1',
     GET_PROJECTS: 'project/list/${organizationId}',
     DELETE_PROJECT: 'project/',
-    GET_VENDORS: 'vendor/list/${organizationId}',
+    GET_VENDORS: 'vendor',
     GET_CLIENTS: 'client/list/${organizationId}',
     DELETE_CLIENT: 'client/',
     DELETE_VENDOR: 'vendor/',

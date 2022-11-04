@@ -48,7 +48,7 @@ export const errorMessage = {
     parentOrganization: `${txtBoxMsg}Parent Organization`,
     organizationName: `${txtBoxMsg}Organization Name`,
     vendorName: `${txtBoxMsg}Vendor Name`,
-    boardNumber: `${txtBoxMsg}Board Number`,
+    boardNumber: `${txtBoxMsg}Client ID`,
     workAddress: `${txtBoxMsg}Work Address`,
     employeeId: `${txtBoxMsg}Employee Id`,
 }

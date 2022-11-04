@@ -28,7 +28,7 @@ const useStyles = makeStyles((theme) => ({
 export default function Login() {
   const classes = useStyles();
   const history = useHistory();
-  const [isBtnDisabled, setButtonDisabled] = useState(false);
+  const [isBtnDisabled, setButtonDisabled] = useState(true);
   const [errorMsg, setErrorMsg] = useState(false);
 
   const [stateObj, setError] = useState({
@@ -86,7 +86,7 @@ export default function Login() {
       const validationObj = error[name];
 
       const { errorObject } = checkValidity(value, name, validationObj);
-      console.log(errorObject.errorMessage, name);
+
       if (errorObject.errorMessage.trim() !== "") {
         result = false;
       }
@@ -94,24 +94,27 @@ export default function Login() {
     }
 
     setError({ account, error: error });
+
     if (result === true) {
-      if (email === "admin" && password === "admin") {
-        history.push("/createproject");
-      } else {
-        setErrorMsg("Invalid User name and password");
-      }
-    }
-    /* if (result === true) {
       httpService
-        .post("/login", {
-          userName: email,
+        .post("/auth/signin", {
+          username: email,
           password,
         })
         .then((res) => {
-          if (res.data.status === 1) history.push("/manageproject");
-          else setErrorMsg(res.data.message);
+          localStorage.setItem("token", res.data.accessToken);
+          window.location.href = PAGE_PATH.createProject;
+          //history.push(PAGE_PATH.createProject);
+        })
+        .catch((e) => {
+          console.log(e);
+          if (e.response.status === 400) {
+            setErrorMsg(e.response.data.message[0]);
+          } else if (e.response.status === 401 || e.response.status === 404) {
+            setErrorMsg(e.response.data.message);
+          }
         });
-    } */
+    }
     e.preventDefault();
   };
 
