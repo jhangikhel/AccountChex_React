@@ -16,14 +16,17 @@ import ManageClient from "./Containers/PrivatePage/Client/ManageClient";
 import ChangePassword from "./Containers/PrivatePage/Admin/ChangePassword";
 import { MuiThemeProvider } from "@material-ui/core/styles";
 import theme from "./config/theme";
-import CreateProject  from './Containers/PrivatePage/Project/CreateProject';
+import CreateProject from './Containers/PrivatePage/Project/CreateProject';
 import CreateClient from './Containers/PrivatePage/Client/CreateClient';
 import CreateVendor from './Containers/PrivatePage/Vendor/CreateVendor';
 import ManageTimesheet from "./Containers/PrivatePage/Timesheet/ManageTimesheet";
 import CreateTimesheet from "./Containers/PrivatePage/Timesheet/CreateTimesheet";
+import ManageAccount from "./Containers/PrivatePage/Admin/ManageAcount";
 
 class App extends Component {
+ 
   render() {
+
     return (
       <MuiThemeProvider theme={theme}>
         <Router>
@@ -35,22 +38,26 @@ class App extends Component {
               <ForgotPassword {...this.props} />
             </Route>
             <WithPrivate
+              path="/manageaccount"
+              component={ManageAccount}
+            ></WithPrivate>
+            <WithPrivate
               path="/manageemployee"
               component={ManageEmployee}
             ></WithPrivate>
-             <WithPrivate
+            <WithPrivate
               path="/manageproject"
               component={ManageProject}
             ></WithPrivate>
-             <WithPrivate
+            <WithPrivate
               path="/manageclient"
               component={ManageClient}
             ></WithPrivate>
-             <WithPrivate
+            <WithPrivate
               path="/managevendor"
               component={ManageVendor}
             ></WithPrivate>
-             <WithPrivate
+            <WithPrivate
               path="/managetimesheet"
               component={ManageTimesheet}
             ></WithPrivate>
@@ -58,15 +65,15 @@ class App extends Component {
               path="/createemployee"
               component={ManageUser}
             ></WithPrivate>
-             <WithPrivate
+            <WithPrivate
               path="/createproject"
               component={CreateProject}
             ></WithPrivate>
-             <WithPrivate
+            <WithPrivate
               path="/createtimesheet"
               component={CreateTimesheet}
             ></WithPrivate>
-              <WithPrivate
+            <WithPrivate
               path="/createclient"
               component={CreateClient}
             ></WithPrivate>
@@ -74,10 +81,13 @@ class App extends Component {
               path="/createvendor"
               component={CreateVendor}
             ></WithPrivate>
+           
             <WithPrivate
               path="/changepassword"
               component={ChangePassword}
             ></WithPrivate>
+
+
           </Switch>
         </Router>
       </MuiThemeProvider>

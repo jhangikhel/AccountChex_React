@@ -6,6 +6,7 @@ import PrimarySearchAppBar from './../Header';
 
 const WithPrivate = ({ component: Component, ...rest }) => {
     let history = useHistory();
+ 
     return (
         <React.Fragment>
             <Route {...rest}

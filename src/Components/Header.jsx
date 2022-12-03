@@ -223,7 +223,7 @@ export default function MiniDrawer(props) {
           })}
         >
           <Grid container>
-            <Grid item lg={3} item={true}>
+            <Grid item lg={3} item>
               <Toolbar>
                 {" "}
                 <Logo />

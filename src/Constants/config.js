@@ -17,6 +17,7 @@ export const PAGE_PATH = {
     createClient: "/createclient",
     createVendor: "/createvendor",
     createTimesheet: "/createtimesheet",
+    manageAccount:"/manageaccount"
 }
 
 //Page Name
@@ -33,7 +34,8 @@ export const PAGE_NAME = {
     createEmployee: "Create Employee",
     createClient: "Create Client",
     createVendor: "Create Vendor",
-    createTimesheet: "Create Timesheet"
+    createTimesheet: "Create Timesheet",
+    manageAccount:"Manage Account"
 }
 //API PATH
 export const API_PATH = {
