@@ -107,6 +107,7 @@ export const menuBar = [
     { id: 9, pageName: PAGE_NAME.createVendor, pagePath: PAGE_PATH.createVendor, isMenuBar: false },
     { id: 11, pageName: PAGE_NAME.manageAccount, pagePath: PAGE_PATH.manageAccount, isMenuBar: true },
     { id: 12, pageName: PAGE_NAME.createRole, pagePath: PAGE_PATH.createRole, isMenuBar: true },
+    { id: 13, pageName: PAGE_NAME.createUser, pagePath: PAGE_PATH.createUser, isMenuBar: true },
 ];
 export const DATEFORMAT = "YYYY-MM-DD";
 export const EPOCTODATETIME = (epocDate) => {

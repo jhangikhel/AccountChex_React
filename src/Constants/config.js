@@ -18,7 +18,8 @@ export const PAGE_PATH = {
     createVendor: "/createvendor",
     createTimesheet: "/createtimesheet",
     manageAccount:"/manageaccount",
-    createRole:"/createrole"
+    createRole:"/createrole",
+    createUser:"/createuser"
 }
 
 //Page Name
@@ -37,7 +38,8 @@ export const PAGE_NAME = {
     createVendor: "Create Vendor",
     createTimesheet: "Create Timesheet",
     manageAccount:"Manage Account",
-    createRole:"Create Role"
+    createRole:"Create Role",
+    createUser:"Create User"
 }
 //API PATH
 export const API_PATH = {

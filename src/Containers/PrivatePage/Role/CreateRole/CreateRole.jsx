@@ -1,4 +1,4 @@
-import { FormControl, FormControlLabel, FormLabel, Grid, Radio, RadioGroup, TextField } from '@material-ui/core';
+import { Button, FormControl, FormControlLabel, FormLabel, Grid, Radio, RadioGroup, TextField } from '@material-ui/core';
 import { Autocomplete } from '@material-ui/lab';
 import React, { useState } from 'react';
 
@@ -70,6 +70,10 @@ const CreateRole = () => {
             account: { ...account, [name]: value },
         });
     };
+    const onSubmitHandler = () => {
+        const { error, account } = stateObj;
+        let result = true;
+    }
     return (<React.Fragment>
         <Grid container spacing={2}>
             <Grid item xs={4}>
@@ -435,6 +439,34 @@ const CreateRole = () => {
                 </Grid>
             </Grid>
         </Grid>
+        <Grid container spacing={8}>
+                <Grid
+                    item
+                    lg={12}
+                    xs={12}
+                    md={12}
+                    className="formBtnHolder"
+                    style={{ textAlign: "center" }}
+                >
+                    <Button
+                        type="submit"
+                        variant="contained"
+                        color="primary"
+                        onClick={onSubmitHandler}
+                    >
+                        {" "}
+                        Submit
+                    </Button>
+                    <Button
+                        type="submit"
+                        variant="contained"
+                        color="primary"
+                        onClick={onSubmitHandler}
+                    >
+                        Reset
+                    </Button>
+                </Grid>
+            </Grid>
     </React.Fragment>);
 }
 
