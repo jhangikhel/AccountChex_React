@@ -38,7 +38,7 @@ export default function Footer() {
                 <Toolbar variant="dense">
                     <IconButton edge="start" color="inherit" aria-label="open drawer" />
                     <div className={classes.grow} />
-                    <Grid container direction="row" justify="center" alignItems="center">
+                    <Grid container direction="row" justifyContent="center" alignItems="center">
                         {'Copyright © '}
                         <Link color="inherit" target="_blank" href={WEB_URL}>
                             {` ${new Date().getFullYear()}`}

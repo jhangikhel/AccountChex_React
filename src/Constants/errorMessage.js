@@ -51,6 +51,18 @@ export const errorMessage = {
     boardNumber: `${txtBoxMsg}Client ID`,
     workAddress: `${txtBoxMsg}Work Address`,
     employeeId: `${txtBoxMsg}Employee Id`,
+    parentAccount: `${ddlMsg}Parent Account`,
+    accountName: `${txtBoxMsg}Account Name`,
+    organizationType:`${ddlMsg}Organization Type` ,
+    billingContactNumber:`${txtBoxMsg}Contact Number`,
+    billingAddress:`${txtBoxMsg}Address`,
+    billingPrimayEmail: `${txtBoxMsg}Primary Email Id`,
+    billingSecondaryEmail:`${txtBoxMsg}Secondary Email Id`,
+    currency:  `${ddlMsg}Currency`,
+    accountType: `${ddlMsg}Account Type`,
+    biilingDate: `${ddlMsg}Billing Date`,
+    frequency: `${ddlMsg}Frequency`,
+    taxId: `${txtBoxMsg}Tax Id`
 }
 
 export const confirmationPopupMessages = {

@@ -690,8 +690,8 @@ export default function AddProject(props) {
             name="projectDescription"
             //placeholder="Description"
             multiline
-            rows={4}
-            rowsMax={4}
+            minRows={4}
+            maxRows={4}
             error={!stateObj.error.projectDescription.errorObject.isValid}
             helperText={
               stateObj.error.projectDescription.errorObject.errorMessage

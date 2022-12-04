@@ -1,8 +1,6 @@
-import React from "react";
-import { makeStyles } from "@material-ui/core/styles";
+import React, { useEffect, useState } from "react";
 import Grid from "@material-ui/core/Grid";
-import { TextField, MenuItem, Button, Box, TextareaAutosize } from "@material-ui/core";
-import { useEffect, useState } from "react";
+import { TextField, Button, Box, Radio, RadioGroup, FormControlLabel, FormLabel } from "@material-ui/core";
 import { checkValidity, fillTemplate } from "./../../../Shared/index";
 import { Autocomplete } from '@material-ui/lab';
 import { useHistory } from 'react-router-dom';
@@ -11,30 +9,13 @@ import { API_PATH } from "../../../Constants/config";
 import CustomizedSnackbars from './../../../Components/CustomizedSnackbars';
 import NumberFormatCustom from "../../../Components/Forms/NumericInput";
 import httpService from "../../../API/HttpService/httpService";
-import { KeyboardDatePicker, MuiPickersUtilsProvider } from "@material-ui/pickers";
-import DateFnsUtils from "@date-io/date-fns";
 import LoadingPage from "../../../Components/Control/LoadingPage";
 
-const useStyles = makeStyles((theme) => ({
-    root: {
-        flexGrow: 1,
-    },
-    paper: {
-        padding: theme.spacing(1),
-        textAlign: "center",
-        color: theme.palette.text.secondary,
-    },
-    datePicker: {
-        marginLeft: theme.spacing(1),
-        marginRight: theme.spacing(1),
-        width: 200,
-    },
-}));
+
 
 
 const ManageAccount = () => {
 
-    const classes = useStyles();
     const history = useHistory();
     const [countries, setCountries] = useState([]);
     const [states, setStates] = useState([]);
@@ -43,18 +24,37 @@ const ManageAccount = () => {
     const [vendors, setVendors] = useState([]);
     const [accountManagers, setAccountManagers] = useState([]);
     const [clients, setClients] = useState([]);
-    const [vendorsTier2, setvendorsTier2] = useState([]);
     const [message, setMessage] = React.useState(snackbarMessages.createSuccess);
-    const [isVendorTier2Disabled, setVendorTier2Disabled] = useState(true);
+
     const [stateObj, setError] = useState({
         error: {
             accountName: {
                 errorObject: { required: true, errorMessage: "", isValid: true },
             },
-            projectDescription: {
+            taxId: {
+                errorObject: { required: true, errorMessage: "", isValid: true },
+            },
+            billingContactNumber: {
+                errorObject: { required: true, errorMessage: "", isValid: true },
+            },
+            billingAddress: {
+                errorObject: { required: true, errorMessage: "", isValid: true },
+            },
+            billingPrimayEmail: {
+                errorObject: { required: true, errorMessage: "", isValid: true },
+            },
+            billingSecondaryEmail: {
                 errorObject: { required: true, errorMessage: "", isValid: true },
             },
             parentAccount: {
+                errorObject: {
+                    required: true,
+                    isValid: true,
+                    errorMessage: "",
+                    isDropdown: true,
+                },
+            },
+            accountType: {
                 errorObject: {
                     required: true,
                     isValid: true,
@@ -70,7 +70,7 @@ const ManageAccount = () => {
                     isDropdown: true,
                 },
             },
-            client: {
+            country: {
                 errorObject: {
                     required: true,
                     isValid: true,
@@ -78,26 +78,16 @@ const ManageAccount = () => {
                     isDropdown: true,
                 },
             },
-            startDate: {
+            biilingDate: {
                 errorObject: {
                     required: true,
                     isValid: true,
-                    isDate: true,
                     errorMessage: "",
+                    isDropdown: true,
                 },
             },
-            endDate: {
-                errorObject: {
-                    required: true,
-                    isValid: true,
-                    isDate: true,
-                    errorMessage: "",
-                },
-            },
-            workAddress: {
-                errorObject: { required: true, isValid: true, errorMessage: "" },
-            },
-            country: {
+
+            frequency: {
                 errorObject: {
                     required: true,
                     isValid: true,
@@ -137,32 +127,25 @@ const ManageAccount = () => {
                     minLength: 6,
                     errorMessage: "",
                 },
-            },
-            vendorsTier2: {
-                errorObject: {
-                    required: true,
-                    isValid: true,
-                    isNumeric: true,
-                    errorMessage: "",
-                },
-            },
+            }
         },
         account: {
             parentAccount: null,
             accountName: "",
-            projectDescription: "",
             organizationType: null,
-
-            vendorsTier2: null,
-            client: null,
-            startDate: new Date(),
-            endDate: new Date(),
-            workAddress: "",
+            billingContactNumber: "",
+            billingAddress: "",
+            billingPrimayEmail: "",
+            billingSecondaryEmail:"",
             country: null,
             currency: null,
             state: null,
             city: null,
-            zipCode: ""
+            zipCode: "",
+            accountType: null,
+            biilingDate: null,
+            frequency: null,
+            taxId: ""
         },
     });
 
@@ -214,16 +197,6 @@ const ManageAccount = () => {
             account: { ...account, [cntrlName]: value },
         });
     };
-    const getVendors = (accountId) => {
-        httpService.get(`${API_PATH.GET_VENDOR}${accountId}`).then((res) => {
-            setvendorsTier2(res.data);
-            if (res.data) {
-                setVendorTier2Disabled(false);
-            } else {
-                setVendorTier2Disabled(true);
-            }
-        });
-    };
     const changeHandler = (e) => {
         const { value, name } = e.target;
         const { error, account } = stateObj;
@@ -247,7 +220,7 @@ const ManageAccount = () => {
             const validationObj = error[name];
 
             const { errorObject } = checkValidity(value, name, validationObj);
-            console.log(errorObject.errorMessage, name);
+            console.log(errorObject.errorMessage, name, stateObj);
             if (errorObject.errorMessage !== "") {
                 result = false;
             }
@@ -290,17 +263,6 @@ const ManageAccount = () => {
             });
         }
     };
-    const onDatePickerChanged = (cntrlName, value) => {
-        const { error, account } = stateObj;
-        const validationObj = error[cntrlName];
-        console.log(cntrlName, value, validationObj);
-        const { errorObject } = checkValidity(value, cntrlName, validationObj);
-        setError({
-            ...stateObj,
-            error: { ...error, [cntrlName]: { errorObject } },
-            account: { ...account, [cntrlName]: value },
-        });
-    };
 
     const closeSnackbar = () => {
         setSnackbar(false);
@@ -322,6 +284,7 @@ const ManageAccount = () => {
                         options={vendors}
                         margin="normal"
                         fullWidth
+
                         renderInput={(params) => {
                             return (
                                 <TextField
@@ -338,8 +301,10 @@ const ManageAccount = () => {
                                     InputLabelProps={{
                                         shrink: true,
                                     }}
+                                    className="required-label"
                                     label="Select Parent Account"
                                     variant="outlined"
+                                    autoFocus
                                 />
                             );
                         }}
@@ -351,7 +316,7 @@ const ManageAccount = () => {
                         margin="normal"
                         fullWidth
                         id="accountName"
-                        label="Account Name"
+                        label="Account Name *"
                         name="accountName"
                         error={!stateObj.error.accountName.errorObject.isValid}
                         helperText={
@@ -364,7 +329,7 @@ const ManageAccount = () => {
                         inputProps={{
                             maxLength: 50,
                         }}
-                        autoFocus
+
                     />
                 </Grid>
                 <Grid item xs={4}>
@@ -409,6 +374,282 @@ const ManageAccount = () => {
             </Grid>
 
             <Grid container spacing={2}>
+                <Grid item xs={12} sm={12} md={6} lg={4}>
+                    <Autocomplete
+                        value={stateObj.account.accountType}
+                        onChange={(event, newValue) => {
+                            onDropdownChangeHandler("accountType", newValue);
+                        }}
+                        getOptionLabel={(option) => {
+                            return option.alias;
+                        }}
+                        id="controllable-states-demo"
+                        name="accountType"
+                        options={countries}
+                        margin="normal"
+                        fullWidth
+                        renderInput={(params) => {
+                            return (
+                                <TextField
+                                    {...params}
+                                    error={!stateObj.error.accountType.errorObject.isValid}
+                                    helperText={stateObj.error.accountType.errorObject.errorMessage}
+                                    name="accountType"
+                                    margin="normal"
+                                    inputProps={{
+                                        ...params.inputProps,
+                                        autoComplete: "new-password", // disable autocomplete and autofill
+                                    }}
+                                    fullWidth
+                                    InputLabelProps={{
+                                        shrink: true,
+                                    }}
+                                    label="Select Accont Type"
+                                    variant="outlined"
+                                />
+                            );
+                        }}
+                    />
+                </Grid>
+                <Grid item xs={12} sm={12} md={6} lg={4}>
+                    <FormLabel id="demo-radio-buttons-group-label">Billing Flag</FormLabel>
+                    <RadioGroup
+                        row
+                        aria-label="TEST"
+                        aria-labelledby="demo-controlled-radio-buttons-group"
+                        name="controlled-radio-buttons-group"
+                    //value={value}
+                    //onChange={handleChange}
+                    >
+                        <FormControlLabel value="yes" control={<Radio />} label="Yes" />
+                        <FormControlLabel value="no" control={<Radio />} label="No" />
+                    </RadioGroup>
+                </Grid>
+                <Grid item xs={12} sm={12} md={6} lg={4}>
+                    <Autocomplete
+                        value={stateObj.account.biilingDate}
+                        onChange={(event, newValue) => {
+                            onDropdownChangeHandler("biilingDate", newValue);
+                        }}
+                        getOptionLabel={(option) => {
+                            return option.alias;
+                        }}
+                        id="controllable-states-demo"
+                        name="biilingDate"
+                        options={countries}
+                        margin="normal"
+                        fullWidth
+                        renderInput={(params) => {
+                            return (
+                                <TextField
+                                    {...params}
+                                    error={!stateObj.error.biilingDate.errorObject.isValid}
+                                    helperText={stateObj.error.biilingDate.errorObject.errorMessage}
+                                    name="biilingDate"
+                                    margin="normal"
+                                    inputProps={{
+                                        ...params.inputProps,
+                                        autoComplete: "new-password", // disable autocomplete and autofill
+                                    }}
+                                    fullWidth
+                                    InputLabelProps={{
+                                        shrink: true,
+                                    }}
+                                    label="Select Billing Date"
+                                    variant="outlined"
+                                />
+                            );
+                        }}
+                    />
+                </Grid>
+
+                <Grid item xs={12} sm={12} md={6} lg={4}>
+                    <Autocomplete
+                        value={stateObj.account.frequency}
+                        onChange={(event, newValue) => {
+                            onDropdownChangeHandler("frequency", newValue);
+                        }}
+                        getOptionLabel={(option) => {
+                            return option.alias;
+                        }}
+                        id="controllable-states-demo"
+                        name="frequency"
+                        options={countries}
+                        margin="normal"
+                        fullWidth
+                        renderInput={(params) => {
+                            return (
+                                <TextField
+                                    {...params}
+                                    error={!stateObj.error.frequency.errorObject.isValid}
+                                    helperText={stateObj.error.frequency.errorObject.errorMessage}
+                                    name="frequency"
+                                    margin="normal"
+                                    inputProps={{
+                                        ...params.inputProps,
+                                        autoComplete: "new-password", // disable autocomplete and autofill
+                                    }}
+                                    fullWidth
+                                    InputLabelProps={{
+                                        shrink: true,
+                                    }}
+                                    label="Select Frequency"
+                                    variant="outlined"
+                                />
+                            );
+                        }}
+                    />
+                </Grid>
+                <Grid item xs={12} sm={12} md={6} lg={4}>
+                    <TextField
+                        variant="outlined"
+                        margin="normal"
+                        fullWidth
+                        id="taxId"
+                        label="Tax Id"
+                        name="taxId"
+                        error={!stateObj.error.taxId.errorObject.isValid}
+                        helperText={
+                            stateObj.error.taxId.errorObject.errorMessage
+                        }
+                        onChange={changeHandler}
+                        InputLabelProps={{
+                            shrink: true,
+                        }}
+                        inputProps={{
+                            maxLength: 50,
+                        }}
+
+                    />
+                </Grid>
+
+                <Grid item xs={12} sm={12} md={6} lg={4}>
+                    <Autocomplete
+                        value={stateObj.account.currency}
+                        onChange={(event, newValue) => {
+                            onDropdownChangeHandler("currency", newValue);
+                        }}
+                        getOptionLabel={(option) => {
+                            return option.alias;
+                        }}
+                        id="controllable-states-demo"
+                        name="currency"
+                        options={countries}
+                        margin="normal"
+                        fullWidth
+                        renderInput={(params) => {
+                            return (
+                                <TextField
+                                    {...params}
+                                    error={!stateObj.error.currency.errorObject.isValid}
+                                    helperText={stateObj.error.currency.errorObject.errorMessage}
+                                    name="currency"
+                                    margin="normal"
+                                    inputProps={{
+                                        ...params.inputProps,
+                                        autoComplete: "new-password", // disable autocomplete and autofill
+                                    }}
+                                    fullWidth
+                                    InputLabelProps={{
+                                        shrink: true,
+                                    }}
+                                    label="Select Currency"
+                                    variant="outlined"
+                                />
+                            );
+                        }}
+                    />
+                </Grid>
+                <Grid item xs={12} sm={12} md={6} lg={4}>
+                    <TextField
+                        variant="outlined"
+                        margin="normal"
+                        fullWidth
+                        id="billingContactNumber"
+                        label="Billing Contact Number"
+                        name="taxId"
+                        error={!stateObj.error.billingContactNumber.errorObject.isValid}
+                        helperText={
+                            stateObj.error.billingContactNumber.errorObject.errorMessage
+                        }
+                        onChange={changeHandler}
+                        InputLabelProps={{
+                            shrink: true,
+                        }}
+                        inputProps={{
+                            maxLength: 50,
+                        }}
+
+                    />
+                </Grid>
+
+                <Grid item xs={12} sm={12} md={6} lg={4}>
+                    <TextField
+                        variant="outlined"
+                        margin="normal"
+                        fullWidth
+                        id="billingAddress"
+                        label="Billing Address"
+                        name="billingAddress"
+                        error={!stateObj.error.billingAddress.errorObject.isValid}
+                        helperText={
+                            stateObj.error.billingAddress.errorObject.errorMessage
+                        }
+                        onChange={changeHandler}
+                        InputLabelProps={{
+                            shrink: true,
+                        }}
+                        inputProps={{
+                            maxLength: 50,
+                        }}
+
+                    />
+                </Grid>
+                <Grid item xs={12} sm={12} md={6} lg={4}>
+                    <TextField
+                        variant="outlined"
+                        margin="normal"
+                        fullWidth
+                        id="billingPrimayEmail"
+                        label="Billing Primary Email"
+                        name="billingPrimayEmail"
+                        error={!stateObj.error.billingPrimayEmail.errorObject.isValid}
+                        helperText={
+                            stateObj.error.billingPrimayEmail.errorObject.errorMessage
+                        }
+                        onChange={changeHandler}
+                        InputLabelProps={{
+                            shrink: true,
+                        }}
+                        inputProps={{
+                            maxLength: 50,
+                        }}
+
+                    />
+                </Grid>
+                <Grid item xs={12} sm={12} md={6} lg={4}>
+                    <TextField
+                        variant="outlined"
+                        margin="normal"
+                        fullWidth
+                        id="billingSecondaryEmail"
+                        label="Billing Secondary Email"
+                        name="billingSecondaryEmail"
+                        error={!stateObj.error.billingSecondaryEmail.errorObject.isValid}
+                        helperText={
+                            stateObj.error.billingSecondaryEmail.errorObject.errorMessage
+                        }
+                        onChange={changeHandler}
+                        InputLabelProps={{
+                            shrink: true,
+                        }}
+                        inputProps={{
+                            maxLength: 50,
+                        }}
+
+                    />
+                </Grid>
+
                 <Grid item xs={4}>
                     <Autocomplete
                         value={stateObj.account.country}
@@ -448,117 +689,6 @@ const ManageAccount = () => {
                 </Grid>
                 <Grid item xs={12} sm={12} md={6} lg={4}>
                     <Autocomplete
-                        value={stateObj.account.currency}
-                        onChange={(event, newValue) => {
-                            onDropdownChangeHandler("currency", newValue);
-                        }}
-                        getOptionLabel={(option) => {
-                            return option.alias;
-                        }}
-                        id="controllable-states-demo"
-                        name="currency"
-                        options={countries}
-                        margin="normal"
-                        fullWidth
-                        renderInput={(params) => {
-                            return (
-                                <TextField
-                                    {...params}
-                                    error={!stateObj.error.currency.errorObject.isValid}
-                                    helperText={stateObj.error.currency.errorObject.errorMessage}
-                                    name="currency"
-                                    margin="normal"
-                                    inputProps={{
-                                        ...params.inputProps,
-                                        autoComplete: "new-password", // disable autocomplete and autofill
-                                    }}
-                                    fullWidth
-                                    InputLabelProps={{
-                                        shrink: true,
-                                    }}
-                                    label="Select Currency"
-                                    variant="outlined"
-                                />
-                            );
-                        }}
-                    />
-                </Grid>
-
-                <Grid item xs={12} sm={12} md={6} lg={4}>
-                    <MuiPickersUtilsProvider utils={DateFnsUtils}>
-                        <KeyboardDatePicker
-                            margin="normal"
-                            inputVariant="outlined"
-                            fullWidth
-                            disableFuture
-                            id="date-picker-dialog"
-                            label="Start Date"
-                            format="MM/dd/yyyy"
-                            value={stateObj.account.startDate}
-                            onChange={(event, newValue) => {
-                                onDatePickerChanged("startDate", newValue);
-                            }}
-                            error={!stateObj.error.startDate.errorObject.isValid}
-                            helperText={stateObj.error.startDate.errorObject.errorMessage}
-                            KeyboardButtonProps={{
-                                "aria-label": "change date",
-                            }}
-                        />
-                    </MuiPickersUtilsProvider>
-                </Grid>
-
-            </Grid>
-            <Grid container spacing={2}>
-                <Grid item xs={12} sm={12} md={6} lg={4}>
-                    <MuiPickersUtilsProvider utils={DateFnsUtils}>
-                        <KeyboardDatePicker
-                            margin="normal"
-                            inputVariant="outlined"
-                            fullWidth
-                            disableFuture
-                            id="date-picker-dialog"
-                            label="End Date"
-                            format="MM/dd/yyyy"
-                            value={stateObj.account.endDate}
-                            onChange={(event, newValue) => {
-                                onDatePickerChanged("endDate", newValue);
-                            }}
-                            error={!stateObj.error.endDate.errorObject.isValid}
-                            helperText={stateObj.error.endDate.errorObject.errorMessage}
-                            KeyboardButtonProps={{
-                                "aria-label": "change date",
-                            }}
-                        />
-                    </MuiPickersUtilsProvider>
-                </Grid>
-                <Grid item xs={12} sm={12} md={6} lg={4}>
-                    <TextField
-                        variant="outlined"
-                        margin="normal"
-                        fullWidth
-                        id="workAddress"
-                        label="Work Address"
-                        name="workAddress"
-                        autoComplete="workAddress"
-                        InputLabelProps={{
-                            shrink: true,
-                        }}
-                        inputProps={{
-                            maxLength: 250,
-                        }}
-                        error={!stateObj.error.workAddress.errorObject.isValid}
-                        helperText={stateObj.error.workAddress.errorObject.errorMessage}
-                        onChange={changeHandler}
-                    />
-                </Grid>
-
-                <Grid item xs={12} sm={12} md={6} lg={4}>
-
-                </Grid>
-            </Grid>
-            <Grid container spacing={2}>
-                <Grid item xs={12} sm={12} md={6} lg={4}>
-                    <Autocomplete
                         value={stateObj.account.state}
                         onChange={(event, newValue) => {
                             onDropdownChangeHandler("state", newValue);
@@ -592,6 +722,9 @@ const ManageAccount = () => {
                         }}
                     />
                 </Grid>
+
+
+
                 <Grid item xs={12} sm={12} md={6} lg={4}>
                     <Autocomplete
                         value={stateObj.account.city}
@@ -651,33 +784,7 @@ const ManageAccount = () => {
                     />
                 </Grid>
             </Grid>
-            <Grid container spacing={2}>
-                <Grid item xs={12} sm={12} md={6} lg={4}>
-                    <TextField
-                        variant="outlined"
-                        margin="normal"
-                        fullWidth
-                        id="projectDescription"
-                        label="Project Description"
-                        name="projectDescription"
-                        //placeholder="Description"
-                        multiline
-                        rows={4}
-                        rowsMax={4}
-                        error={!stateObj.error.projectDescription.errorObject.isValid}
-                        helperText={
-                            stateObj.error.projectDescription.errorObject.errorMessage
-                        }
-                        onChange={changeHandler}
-                        InputLabelProps={{
-                            shrink: true,
-                        }}
-                        inputProps={{
-                            maxLength: 500,
-                        }}
-                    />
-                </Grid>
-            </Grid>
+
 
 
 

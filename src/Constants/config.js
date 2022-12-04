@@ -17,7 +17,8 @@ export const PAGE_PATH = {
     createClient: "/createclient",
     createVendor: "/createvendor",
     createTimesheet: "/createtimesheet",
-    manageAccount:"/manageaccount"
+    manageAccount:"/manageaccount",
+    createRole:"/createrole"
 }
 
 //Page Name
@@ -35,7 +36,8 @@ export const PAGE_NAME = {
     createClient: "Create Client",
     createVendor: "Create Vendor",
     createTimesheet: "Create Timesheet",
-    manageAccount:"Manage Account"
+    manageAccount:"Manage Account",
+    createRole:"Create Role"
 }
 //API PATH
 export const API_PATH = {
@@ -50,9 +52,7 @@ export const API_PATH = {
     GET_DEPARTMENTS: '/dropdown/employee?downType=GET_DEPARTMENTS',
     GET_WAGE_CYCLE: '/dropdown/employee?downType=GET_WAGE_CYCLE',
     GET_CLIENT_BY_VENDOR_ID: 'dropdown/client?vendorId=',
-    GET_GENDER: '/dropdown/employee?downType=GET_GENDER',
- 
-    
+    GET_GENDER: '/dropdown/employee?downType=GET_GENDER',    
     GET_REPORTINGTO: '/dropdown/reportingto?organizationId=1&departmentId=',
     GET_VENDOR: 'dropdown/vendor?accountId=',
     GET_PROJECT: '/dropdown/project?vendorId=',
