@@ -88,8 +88,8 @@ function TablePaginationActions(props) {
         {theme.direction === "rtl" ? (
           <KeyboardArrowRight />
         ) : (
-            <KeyboardArrowLeft />
-          )}
+          <KeyboardArrowLeft />
+        )}
       </IconButton>
       <IconButton
         onClick={handleNextButtonClick}
@@ -99,8 +99,8 @@ function TablePaginationActions(props) {
         {theme.direction === "rtl" ? (
           <KeyboardArrowLeft />
         ) : (
-            <KeyboardArrowRight />
-          )}
+          <KeyboardArrowRight />
+        )}
       </IconButton>
       <IconButton
         onClick={handleLastPageButtonClick}
@@ -165,16 +165,12 @@ export default function ManageProject() {
   const cancelHandlePopup = () => {
     setPopup(false);
   };
-  const emptyRows =
-    rowsPerPage - Math.min(rowsPerPage, rows.length - page * rowsPerPage);
-  const userId = 1;
-  let fillTemp = fillTemplate(API_PATH.GET_PROJECTS, "organizationId");
+
 
   useEffect(() => {
     if (isReload === true) {
-      const apiPath = fillTemp(userId);
-      httpService.get(apiPath).then((res) => {
-        setRowData(res.data);
+      httpService.get(API_PATH.GET_PROJECTS).then((res) => {
+        setRowData(res.data.data);
         setReload(false);
       });
     }
@@ -233,13 +229,13 @@ export default function ManageProject() {
                   <TableCell component="th" scope="row"></TableCell>
                   <TableCell component="th" scope="row"></TableCell>
                   {/* {tableObj.map(({ title }) => <TableCell component="th" scope="row">{title}</TableCell>)} */}
-                  <TableCell component="th" scope="row">
+                   <TableCell component="th" scope="row">
                     Project Name
                   </TableCell>
                   <TableCell component="th" scope="row">
                     Account Manager
                   </TableCell>
-                  <TableCell component="th" scope="row">
+                 {/* <TableCell component="th" scope="row">
                     Vendor
                   </TableCell>
                   <TableCell component="th" scope="row">
@@ -247,7 +243,7 @@ export default function ManageProject() {
                   </TableCell>
                   <TableCell component="th" scope="row">
                     Address
-                  </TableCell>
+                  </TableCell>*/}
                   <TableCell component="th" scope="row">
                     Country
                   </TableCell>
@@ -262,7 +258,7 @@ export default function ManageProject() {
                   </TableCell>
                   <TableCell component="th" scope="row">
                     Description
-                  </TableCell>
+                  </TableCell> 
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -281,12 +277,12 @@ export default function ManageProject() {
                           {selectedRowIndex === idx ? (
                             <KeyboardArrowUpIcon />
                           ) : (
-                              <KeyboardArrowDownIcon />
-                            )}
+                            <KeyboardArrowDownIcon />
+                          )}
                         </IconButton>
                       </TableCell>
                       <TableCell>
-                        <IconButton aria-label="delete row" size="small" onClick={() => handleClickOpen(row.project_id, row.project_name)}>
+                        <IconButton aria-label="delete row" size="small" onClick={() => handleClickOpen(row.id, row.project_name)}>
                           <FontAwesomeIcon icon={faTrash} />
                         </IconButton>
                         <IconButton aria-label="edit row" size="small">
@@ -294,20 +290,20 @@ export default function ManageProject() {
                         </IconButton>
                       </TableCell>
                       {/* {tableObj.map(({ proopName }) =>  <TableCell scope="row">{row[proopName]}</TableCell>)} */}
-                      <TableCell scope="row">{row.project_name}</TableCell>
-                      <TableCell scope="row">{row.account_manager}</TableCell>
-                      <TableCell>{`${row.vendor_1} ${row.vendor_2 ? row.vendor_2 : ""}`}</TableCell>
+                      <TableCell scope="row">{row.name}</TableCell>
+                       <TableCell scope="row">{row.account.name}</TableCell>
+                     {/* <TableCell>{`${row.vendor_1} ${row.vendor_2 ? row.vendor_2 : ""}`}</TableCell>
                       <TableCell>{row.client}</TableCell>
                       <TableCell>
                         {`${row.work_address}`}
-                      </TableCell>
-                      <TableCell>{`${row.country}`}</TableCell>
-                      <TableCell>{`${row.state}`}</TableCell>
-                      <TableCell>{`${row.city}`}</TableCell>
+                      </TableCell>*/}
+                      <TableCell>{`${row.country.name}`}</TableCell>
+                      <TableCell>{`${row.state.name}`}</TableCell>
+                      <TableCell>{`${row.city.name}`}</TableCell>
                       <TableCell>{row.zipcode}</TableCell>
-                      <TableCell>{`${row.description}`}</TableCell>
+                      <TableCell>{`${row.description}`}</TableCell> 
                     </TableRow>
-                    { selectedRowIndex === idx &&
+                    {selectedRowIndex === idx &&
                       <TableRow key={idx}>
                         <TableCell
                           style={{ paddingBottom: 0, paddingTop: 0 }}

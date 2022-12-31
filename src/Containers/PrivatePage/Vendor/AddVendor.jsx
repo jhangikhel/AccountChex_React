@@ -30,7 +30,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function AddVendor(props) {
+export default function AddVendor({vendorId}) {
   const classes = useStyles();
   const history = useHistory();
   const [countries, setCountries] = useState([]);
@@ -61,7 +61,7 @@ export default function AddVendor(props) {
         },
       },
       address1: {
-        errorObject: { required: true, isValid: true, errorMessage: "" },
+        errorObject: { required: true, isValid: true, errorMessage: "", minLength: 10 },
       },
       address2: {
         errorObject: { required: false, isValid: true, errorMessage: "" },
@@ -122,6 +122,37 @@ export default function AddVendor(props) {
     },
   });
   useEffect(() => {
+    let fillTemp1 = fillTemplate(API_PATH.GET_VENDOR_DETAIL, "vendorId");
+    const apiPath1 = fillTemp1(vendorId);
+    const { error, account } = stateObj;
+    httpService.get(apiPath1).then(r => {
+      const { data } = r;
+      const {  name: vendorName, emailId: email, websiteUrl: websiteURL,
+        country,
+        state,
+        city,
+        zipCode,
+        address1,
+        address2, } = data;
+
+      console.log({ ...account, address1 });
+      setError({
+        ...stateObj,
+        error: { ...error },
+        account: {
+          ...account, vendorName, email,  websiteURL, country,
+          state,
+          city,
+          zipCode,
+          address1,
+          address2
+        },
+      });
+    }).catch(err => {
+
+    })
+  }, [vendorId]);
+  useEffect(() => {
     httpService
       .all([
         httpService.get(API_PATH.GET_COUNTRY),
@@ -133,13 +164,23 @@ export default function AddVendor(props) {
         setVendors(vendors.data);
       });
   }, []);
+  useEffect(() => {
+    if (stateObj.account.country) {
+      getStates(stateObj.account.country.id);
+    }
+  }, [stateObj.account.country])
+  useEffect(() => {
+    if (stateObj.account.state) {
+      getCities(stateObj.account.state.id);
+    }
+  }, [stateObj.account.state])
   const getStates = (countryId) => {
-    httpService.get(`${API_PATH.GET_STATE}/${countryId}`).then((res) => {
+    httpService.get(`${API_PATH.GET_STATE}${countryId}`).then((res) => {
       setStates(res.data);
     });
   };
   const getCities = (stateId) => {
-    httpService.get(`${API_PATH.GET_CITY}/${stateId}`).then((res) => {
+    httpService.get(`${API_PATH.GET_CITY}${stateId}`).then((res) => {
       setCities(res.data);
     });
   };
@@ -168,16 +209,15 @@ export default function AddVendor(props) {
         error: { ...error, [cntrlName]: { errorObject } },
         account: { ...account, [cntrlName]: value, city: null, state: null },
       });
-      getStates(id);
       return;
+     
     } else if (cntrlName === "state") {
       setError({
         ...stateObj,
         error: { ...error, [cntrlName]: { errorObject } },
         account: { ...account, [cntrlName]: value, city: null },
       });
-      getCities(id);
-      return;
+     return;
     }
     console.log(cntrlName, value);
     setError({
@@ -210,7 +250,7 @@ export default function AddVendor(props) {
       httpService
         .post(API_PATH.CREATE_VENDOR, {
           name: account.vendorName,
-          parentVendorId: account.vendor && account.vendor.vendor_parentId,
+          parentId: account.vendor && account.vendor.id,
           emailId: account.email,
           websiteUrl: account.websiteURL,
           address1: account.address1,
@@ -247,9 +287,7 @@ export default function AddVendor(props) {
   ) : (
     <React.Fragment>
       <Grid container spacing={2}>
-        <Grid item xs={12} sm={12} md={6} lg={4}>
-          <TreeViewComponent />
-        </Grid>
+
         <Grid item xs={12} sm={12} md={6} lg={4}>
           <Autocomplete
             value={stateObj.account.vendor}
@@ -306,6 +344,7 @@ export default function AddVendor(props) {
             inputProps={{
               maxLength: 50,
             }}
+            value={stateObj.account.vendorName}
           />
         </Grid>
 
@@ -326,6 +365,7 @@ export default function AddVendor(props) {
             error={!stateObj.error.email.errorObject.isValid}
             helperText={stateObj.error.email.errorObject.errorMessage}
             onChange={changeHandler}
+            value={stateObj.account.email}
           />
         </Grid>
       </Grid>
@@ -347,6 +387,7 @@ export default function AddVendor(props) {
             inputProps={{
               maxLength: 50,
             }}
+            value={stateObj.account.websiteURL}
           />
         </Grid>
         <Grid item xs={12} sm={12} md={6} lg={4}>
@@ -367,6 +408,7 @@ export default function AddVendor(props) {
             error={!stateObj.error.address1.errorObject.isValid}
             helperText={stateObj.error.address1.errorObject.errorMessage}
             onChange={changeHandler}
+            value={stateObj.account.address1}
           />
         </Grid>
         <Grid item xs={12} sm={12} md={6} lg={4}>
@@ -382,6 +424,7 @@ export default function AddVendor(props) {
               shrink: true,
             }}
             onChange={changeHandler}
+            value={stateObj.account.address2}
           />
         </Grid>
       </Grid>
@@ -514,6 +557,7 @@ export default function AddVendor(props) {
           error={!stateObj.error.zipCode.errorObject.isValid}
           helperText={stateObj.error.zipCode.errorObject.errorMessage}
           onChange={changeHandler}
+          value={stateObj.account.zipCode}
         />
       </Grid>
 

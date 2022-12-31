@@ -1,6 +1,6 @@
-import { createMuiTheme } from "@material-ui/core/styles";
+import { createTheme } from "@material-ui/core/styles";
 
-export const quillgreen = createMuiTheme({
+export const quillgreen = createTheme({
   palette: {
     primary: {
       main: "#049AB8",

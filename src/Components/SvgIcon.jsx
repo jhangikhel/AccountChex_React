@@ -5,9 +5,11 @@ import {
   faUserTie,
   faProjectDiagram,
   faUsers,
-  faHandsHelping,
   faClock,
-  faCity,
+  faUserLock,
+  faHandshake,
+  faTasks,
+  faUser,
 } from "@fortawesome/free-solid-svg-icons";
 
 export const SvgIcon = ({ pageId }) => {
@@ -26,11 +28,11 @@ export const SvgIcon = ({ pageId }) => {
         
       }
       case 4: {
-        return <FontAwesomeIcon icon={faCity} />;
+        return <FontAwesomeIcon icon={faTasks} />;
         
       }
       case 5: {
-        return <FontAwesomeIcon icon={faUsers} />;
+        return <FontAwesomeIcon icon={faHandshake} />;
         
       }
       case 10: {
@@ -39,6 +41,14 @@ export const SvgIcon = ({ pageId }) => {
       }
       case 11: {
         return  <FontAwesomeIcon icon={faUsers} />;
+        
+      }
+      case 12: {
+        return  <FontAwesomeIcon icon={faUserLock} />;
+        
+      }
+      case 13: {
+        return  <FontAwesomeIcon icon={faUser} />;
         
       }
       default: {

@@ -39,6 +39,7 @@ import {
 import AddIcon from "@material-ui/icons/Add";
 import LoadingPage from './../../../Components/Control/LoadingPage';
 import { ClientTabsName } from './../ManageUsers/EmployeeTabs/EmployeeTabsDetails';
+import EditClient from "./EditClient";
 
 const useStyles1 = makeStyles((theme) => ({
   root: {
@@ -94,8 +95,8 @@ function TablePaginationActions(props) {
         {theme.direction === "rtl" ? (
           <KeyboardArrowRight />
         ) : (
-            <KeyboardArrowLeft />
-          )}
+          <KeyboardArrowLeft />
+        )}
       </IconButton>
       <IconButton
         onClick={handleNextButtonClick}
@@ -105,8 +106,8 @@ function TablePaginationActions(props) {
         {theme.direction === "rtl" ? (
           <KeyboardArrowLeft />
         ) : (
-            <KeyboardArrowRight />
-          )}
+          <KeyboardArrowRight />
+        )}
       </IconButton>
       <IconButton
         onClick={handleLastPageButtonClick}
@@ -146,6 +147,8 @@ export default function ManageClient() {
   const [isReload, setReload] = React.useState(true);
   const [selectedRowIndex, setselectedRowIndex] = React.useState(-1);
   const [selectedClientId, setselectedClientId] = React.useState(0);
+  const [editPoup, setEditPopup] = React.useState(false);
+  const [editClientId, seteditClientId] = React.useState(0);
   const openExpansionAndSetClientId = (rowIndex, clientId) => {
     if (selectedRowIndex === rowIndex) {
       rowIndex = -1;
@@ -158,9 +161,14 @@ export default function ManageClient() {
   const handleClickOpen = (id, name) => {
     setProjectName(name);
     setDeleteId(id);
-    setPopup(true);
+    const [isReload, setReload] = React.useState(true);
+    (true);
   };
-
+  const handleClickEditOpen = (id, name) => {
+    //setProjectName(name);
+    seteditClientId(id);
+    setEditPopup(true);
+  };
   const deleteProject = () => {
     httpService
       .delete(`${API_PATH.DELETE_CLIENT}${deleteId}`)
@@ -191,7 +199,8 @@ export default function ManageClient() {
     if (isReload === true) {
       const apiPath = fillTemp(userId);
       httpService.get(apiPath).then((res) => {
-        setRowData(res.data);
+        console.log("RES", res);
+        setRowData(res.data.data);
         setReload(false);
       });
     }
@@ -222,7 +231,7 @@ export default function ManageClient() {
             Client
           </Button>
         </Grid>
-        <Grid item item xs={12} lg={12} sm={12}>
+        <Grid item xs={12} lg={12} sm={12}>
           <TableContainer component={Paper}>
             <Table
               className={classes.table}
@@ -274,7 +283,7 @@ export default function ManageClient() {
                   )
                   : rows
                 ).map((row, idx) => (
-                  <React.Fragment key={row.employee_key}>
+                  <React.Fragment key={row.id}>
                     <TableRow>
                       <TableCell>
                         <IconButton aria-label="expand row" size="small" onClick={() => openExpansionAndSetClientId(idx, row.id)}
@@ -282,31 +291,31 @@ export default function ManageClient() {
                           {selectedRowIndex === idx ? (
                             <KeyboardArrowUpIcon />
                           ) : (
-                              <KeyboardArrowDownIcon />
-                            )}
+                            <KeyboardArrowDownIcon />
+                          )}
                         </IconButton>
                       </TableCell>
                       <TableCell>
                         <IconButton aria-label="delete row" size="small" onClick={() => handleClickOpen(row.id, row.name)}>
                           <FontAwesomeIcon icon={faTrash} />
                         </IconButton>
-                        <IconButton aria-label="edit row" size="small">
+                        <IconButton aria-label="edit row" onClick={() => handleClickEditOpen(row.id, row.name)} size="small">
                           <FontAwesomeIcon icon={faEdit} />
                         </IconButton>
                       </TableCell>
                       {/* {tableObj.map(({ proopName }) =>  <TableCell scope="row">{row[proopName]}</TableCell>)} */}
                       <TableCell scope="row">{row.name}</TableCell>
-                      <TableCell scope="row">{row.board_numer}</TableCell>
-                      <TableCell scope="row">{row.vendor_1}</TableCell>
-                      <TableCell scope="row">{row.email_id}</TableCell>
-                      <TableCell scope="row">{row.website_url}</TableCell>
-                      <TableCell>{`${row.address_1 != null ? row.address_1 : ""} ${row.address_2 != null ? row.address_2 : ""}`}</TableCell>
-                      <TableCell>{`${row.country}`}</TableCell>
-                      <TableCell>{`${row.state}`}</TableCell>
-                      <TableCell>{`${row.city}`}</TableCell>
-                      <TableCell>{row.zip_code}</TableCell>
+                      <TableCell scope="row">{row.boardNumber}</TableCell>
+                      <TableCell scope="row">{row.vendor.name}</TableCell>
+                      <TableCell scope="row">{row.emailId}</TableCell>
+                      <TableCell scope="row">{row.websiteUrl}</TableCell>
+                      <TableCell>{`${row.address1 != null ? row.address1 : ""} ${row.address2 != null ? row.address2 : ""}`}</TableCell>
+                      <TableCell>{`${row.country.name}`}</TableCell>
+                      <TableCell>{`${row.state.name}`}</TableCell>
+                      <TableCell>{`${row.city.name}`}</TableCell>
+                      <TableCell>{row.zipCode}</TableCell>
                     </TableRow>
-                    { selectedRowIndex === idx &&
+                    {selectedRowIndex === idx &&
                       <TableRow key={idx}>
                         <TableCell
                           style={{ paddingBottom: 0, paddingTop: 0 }}
@@ -344,8 +353,8 @@ export default function ManageClient() {
                   inputProps: { "aria-label": "rows per page" },
                   native: true,
                 }}
-                onChangePage={handleChangePage}
-                onChangeRowsPerPage={handleChangeRowsPerPage}
+                onPageChange={handleChangePage}
+                onRowsPerPageChange={handleChangeRowsPerPage}
                 ActionsComponent={TablePaginationActions}
               />
             </Table>
@@ -353,7 +362,10 @@ export default function ManageClient() {
         </Grid>
       </Grid>
       <CustomizedSnackbars open={snackbar} closeSnackbar={closeSnackbar} message={message} />
-      <ModalPopup isPopupOpen={popup} cancelHandlePopup={cancelHandlePopup} submitHandlePopup={deleteProject} deleteName={projectName}></ModalPopup>
+      <ModalPopup isPopupOpen={popup}  cancelHandlePopup={cancelHandlePopup} submitHandlePopup={deleteProject} deleteName={projectName}></ModalPopup>
+      {editPoup === true &&
+        <EditClient clientId={editClientId} />
+      }
     </>
   );
 }

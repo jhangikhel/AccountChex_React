@@ -1,7 +1,7 @@
 import React from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import Grid from "@material-ui/core/Grid";
-import { TextField, MenuItem, Button, Box ,TextareaAutosize} from "@material-ui/core";
+import { TextField, MenuItem, Button, Box, TextareaAutosize } from "@material-ui/core";
 import { useEffect, useState } from "react";
 import { checkValidity, fillTemplate } from "./../../../Shared/index";
 import { Autocomplete } from '@material-ui/lab';
@@ -52,6 +52,9 @@ export default function AddProject(props) {
       projectDescription: {
         errorObject: { required: true, errorMessage: "", isValid: true },
       },
+      email: {
+        errorObject: { required: true, errorMessage: "", isValid: true, isEmail: true },
+      },
       vendor: {
         errorObject: {
           required: true,
@@ -60,7 +63,10 @@ export default function AddProject(props) {
           isDropdown: true,
         },
       },
-       accountManager: {
+      websiteURL: {
+        errorObject: { required: true, errorMessage: "", isValid: true, isURL: true },
+      },
+      accountManager: {
         errorObject: {
           required: true,
           isValid: true,
@@ -68,7 +74,7 @@ export default function AddProject(props) {
           isDropdown: true,
         },
       },
-       client: {
+      client: {
         errorObject: {
           required: true,
           isValid: true,
@@ -91,7 +97,7 @@ export default function AddProject(props) {
           isDate: true,
           errorMessage: "",
         },
-      }, 
+      },
       workAddress: {
         errorObject: { required: true, isValid: true, errorMessage: "" },
       },
@@ -139,39 +145,42 @@ export default function AddProject(props) {
     },
     account: {
       projectTitle: "",
-      projectDescription:"",
-      accountManager:null,
-      vendor:null,
+      projectDescription: "",
+      accountManager: null,
+      vendor: null,
       vendorsTier2: null,
-      client:null,
+      client: null,
       startDate: new Date(),
       endDate: new Date(),
       workAddress: "",
       country: null,
       state: null,
       city: null,
-      zipCode: ""
+      zipCode: "",
+      email: "",
+      websiteURL: "",
     },
   });
 
   const accountId = 1;
-  let fillTemp1 = fillTemplate(API_PATH.GET_CLIENTS, "organizationId");
+  let fillTemp1 = fillTemplate(API_PATH.GET_CLIENTS);
 
   useEffect(() => {
-    const apiPath1 = fillTemp1(accountId);
+
     httpService
       .all([
         httpService.get(API_PATH.GET_COUNTRY),
-        httpService.get(API_PATH.GET_VENDOR+accountId),
-        httpService.get(API_PATH.GET_MANAGER),
-        httpService.get(apiPath1)
+        httpService.get(API_PATH.GET_VENDORS),
+        httpService.get(API_PATH.GET_VENDORS),
+        httpService.get(API_PATH.GET_CLIENTS)
       ])
       .then((responses) => {
-        const [countries,vendors,managers,clients] = responses;
+        const [countries, vendors, managers, clients] = responses;
+        console.log(countries.data)
         setCountries(countries.data);
-        setVendors(vendors.data)
-        setAccountManagers(managers.data);
-        setClients(clients.data)
+        setVendors(vendors.data.data)
+        setAccountManagers(managers.data.data);
+        setClients(clients.data.data)
       });
   }, []);
   const getStates = (countryId) => {
@@ -194,9 +203,9 @@ export default function AddProject(props) {
       getStates(id);
     } else if (cntrlName === "state") {
       getCities(id);
-    }else if (cntrlName === "vendor") {
+    }/* else if (cntrlName === "vendor") {
       getVendors(id);
-    } 
+    }  */
 
     setError({
       ...stateObj,
@@ -249,36 +258,40 @@ export default function AddProject(props) {
 
     if (result === true) {
       let parentOrg = account.vendor.id;
-      if(account.vendorsTier2 != null){
+      if (account.vendorsTier2 != null) {
         parentOrg = account.vendorsTier2.id;
       }
- 
+
       httpService.post(API_PATH.CREATE_PROJECT, {
-        projectTitle:account.projectTitle,
-        projectDescription:account.projectDescription,
-        accountManager:account.accountManager.id,
-        vendor1:account.vendor.id,
-        vendor2:account.vendorsTier2,
-        clientId:account.client.id,
-        startDate:new Date(account.startDate).getTime(),
-        endDate:new Date(account.endDate).getTime(),
-        workAddress:account.workAddress,
-        city:account.city.id,
-        state:account.state.id,
-        country:account.country.id,
-        zipCode:account.zipCode
-    }).then((res) => {
-          setMessage(res.data[0].msg);
+        name: account.projectTitle,
+        description: account.projectDescription,
+        accountManagerId: account.vendor.id,
+        vendorId: parentOrg,
+        vendor2: account.vendorsTier2,
+        clientId: account.client.id,
+        startDate: new Date(account.startDate).getTime(),
+        endDate: new Date(account.endDate).getTime(),
+        address1: account.workAddress,
+        cityId: account.city.id,
+        stateId: account.state.id,
+        countryId: account.country.id,
+        zipCode: account.zipCode,
+        websiteUrl: account.websiteURL,
+        emailId: account.email
+      }).then((res) => {
+        if (res.status === 201) {
+          setMessage(snackbarMessages.createSuccess);
           setSnackbar(true);
-          setTimeout(()=>{
-            if(res.data[0].status === 1){
-              history.push('/manageproject');
-            }
-          },1000)
-         
-      }).catch(err=>{
-          setMessage(snackbarMessages.createError);
-          setSnackbar(true);
+          setTimeout(() => {
+
+            history.push('/manageproject');
+
+          }, 1000)
+        }
+
+      }).catch(err => {
+        setMessage(snackbarMessages.createError);
+        setSnackbar(true);
       });
     }
   };
@@ -296,8 +309,8 @@ export default function AddProject(props) {
 
   const closeSnackbar = () => {
     setSnackbar(false);
-}; 
-  return clients.length !== 0 ? <LoadingPage></LoadingPage> : (
+  };
+  return clients.length === 0 ? <LoadingPage></LoadingPage> : (
     <React.Fragment>
       <Grid container spacing={2}>
         <Grid item xs={12} sm={12} md={6} lg={4}>
@@ -329,7 +342,7 @@ export default function AddProject(props) {
               onDropdownChangeHandler("accountManager", newValue);
             }}
             getOptionLabel={(option) => {
-              return option.account_manager;
+              return option.name;
             }}
             id="controllable-states-demo"
             name="accountManager"
@@ -397,10 +410,48 @@ export default function AddProject(props) {
           />
         </Grid>
 
-      </Grid>
-     
-      <Grid container spacing={2}>
-      <Grid item xs={4}>
+
+        <Grid item xs={12} sm={12} md={6} lg={4}>
+          <TextField
+            variant="outlined"
+            margin="normal"
+            fullWidth
+            id="email"
+            label="Email Id"
+            name="email"
+            InputLabelProps={{
+              shrink: true,
+            }}
+            inputProps={{
+              maxLength: 50,
+            }}
+            error={!stateObj.error.email.errorObject.isValid}
+            helperText={stateObj.error.email.errorObject.errorMessage}
+            value={stateObj.account.email}
+            onChange={changeHandler}
+          />
+        </Grid>
+        <Grid item xs={12} sm={12} md={6} lg={4}>
+          <TextField
+            variant="outlined"
+            margin="normal"
+            fullWidth
+            id="websiteURL"
+            label="Website URL"
+            name="websiteURL"
+            value={stateObj.account.websiteURL}
+            error={!stateObj.error.websiteURL.errorObject.isValid}
+            helperText={stateObj.error.websiteURL.errorObject.errorMessage}
+            onChange={changeHandler}
+            InputLabelProps={{
+              shrink: true,
+            }}
+            inputProps={{
+              maxLength: 50,
+            }}
+          />
+        </Grid>
+        <Grid item xs={4}>
           <Autocomplete
             value={stateObj.account.vendorsTier2}
             onChange={(event, newValue) => {
@@ -441,43 +492,43 @@ export default function AddProject(props) {
           />
         </Grid>
         <Grid item xs={12} sm={12} md={6} lg={4}>
-            <Autocomplete
-              value={stateObj.account.client}
-              onChange={(event, newValue) => {
-                onDropdownChangeHandler("client", newValue);
-              }}
-              getOptionLabel={(option) => {
-                return option.name;
-              }}
-              id="controllable-states-demo"
-              name="client"
-              options={clients}
-              margin="normal"
-              fullWidth
-              renderInput={(params) => {
-                return (
-                  <TextField
-                    {...params}
-                    error={!stateObj.error.client.errorObject.isValid}
-                    helperText={stateObj.error.client.errorObject.errorMessage}
-                    name="client"
-                    margin="normal"
-                    inputProps={{
-                      ...params.inputProps,
-                      autoComplete: "new-password", // disable autocomplete and autofill
-                    }}
-                    fullWidth
-                    InputLabelProps={{
-                      shrink: true,
-                    }}
-                    label="Select Client"
-                    variant="outlined"
-                  />
-                );
-              }}
-            />
-          </Grid> 
-       
+          <Autocomplete
+            value={stateObj.account.client}
+            onChange={(event, newValue) => {
+              onDropdownChangeHandler("client", newValue);
+            }}
+            getOptionLabel={(option) => {
+              return option.name;
+            }}
+            id="controllable-states-demo"
+            name="client"
+            options={clients}
+            margin="normal"
+            fullWidth
+            renderInput={(params) => {
+              return (
+                <TextField
+                  {...params}
+                  error={!stateObj.error.client.errorObject.isValid}
+                  helperText={stateObj.error.client.errorObject.errorMessage}
+                  name="client"
+                  margin="normal"
+                  inputProps={{
+                    ...params.inputProps,
+                    autoComplete: "new-password", // disable autocomplete and autofill
+                  }}
+                  fullWidth
+                  InputLabelProps={{
+                    shrink: true,
+                  }}
+                  label="Select Client"
+                  variant="outlined"
+                />
+              );
+            }}
+          />
+        </Grid>
+
         <Grid item xs={12} sm={12} md={6} lg={4}>
           <MuiPickersUtilsProvider utils={DateFnsUtils}>
             <KeyboardDatePicker
@@ -501,9 +552,9 @@ export default function AddProject(props) {
           </MuiPickersUtilsProvider>
         </Grid>
 
-    </Grid>
-<Grid container spacing={2}>
-<Grid item xs={12} sm={12} md={6} lg={4}>
+
+
+        <Grid item xs={12} sm={12} md={6} lg={4}>
           <MuiPickersUtilsProvider utils={DateFnsUtils}>
             <KeyboardDatePicker
               margin="normal"
@@ -526,161 +577,159 @@ export default function AddProject(props) {
           </MuiPickersUtilsProvider>
         </Grid>
         <Grid item xs={12} sm={12} md={6} lg={4}>
-            <TextField
-              variant="outlined"
-              margin="normal"
-              fullWidth
-              id="workAddress"
-              label="Work Address"
-              name="workAddress"
-              autoComplete="workAddress"
-              InputLabelProps={{
-                shrink: true,
-              }}
-              inputProps={{
-                maxLength: 250,
-              }}
-              error={!stateObj.error.workAddress.errorObject.isValid}
-              helperText={stateObj.error.workAddress.errorObject.errorMessage}
-              onChange={changeHandler}
-            />
-          </Grid>
+          <TextField
+            variant="outlined"
+            margin="normal"
+            fullWidth
+            id="workAddress"
+            label="Work Address"
+            name="workAddress"
+            autoComplete="workAddress"
+            InputLabelProps={{
+              shrink: true,
+            }}
+            inputProps={{
+              maxLength: 250,
+            }}
+            error={!stateObj.error.workAddress.errorObject.isValid}
+            helperText={stateObj.error.workAddress.errorObject.errorMessage}
+            onChange={changeHandler}
+          />
+        </Grid>
 
-          <Grid item xs={12} sm={12} md={6} lg={4}>
-            <Autocomplete
-              value={stateObj.account.country}
-              onChange={(event, newValue) => {
-                onDropdownChangeHandler("country", newValue);
-              }}
-              getOptionLabel={(option) => {
-                return option.alias;
-              }}
-              id="controllable-states-demo"
-              name="country"
-              options={countries}
-              margin="normal"
-              fullWidth
-              renderInput={(params) => {
-                return (
-                  <TextField
-                    {...params}
-                    error={!stateObj.error.country.errorObject.isValid}
-                    helperText={stateObj.error.country.errorObject.errorMessage}
-                    name="country"
-                    margin="normal"
-                    inputProps={{
-                      ...params.inputProps,
-                      autoComplete: "new-password", // disable autocomplete and autofill
-                    }}
-                    fullWidth
-                    InputLabelProps={{
-                      shrink: true,
-                    }}
-                    label="Select Country"
-                    variant="outlined"
-                  />
-                );
-              }}
-            />
-          </Grid>
-          </Grid>
-          <Grid container spacing={2}>
-          <Grid item xs={12} sm={12} md={6} lg={4}>
-            <Autocomplete
-              value={stateObj.account.state}
-              onChange={(event, newValue) => {
-                onDropdownChangeHandler("state", newValue);
-              }}
-              getOptionLabel={(option) => option.name}
-              id="controllable-states-demo"
-              name="state"
-              options={states}
-              margin="normal"
-              fullWidth
-              renderInput={(params) => {
-                return (
-                  <TextField
-                    {...params}
-                    error={!stateObj.error.state.errorObject.isValid}
-                    helperText={stateObj.error.state.errorObject.errorMessage}
-                    name="state"
-                    margin="normal"
-                    inputProps={{
-                      ...params.inputProps,
-                      autoComplete: "new-password", // disable autocomplete and autofill
-                    }}
-                    fullWidth
-                    InputLabelProps={{
-                      shrink: true,
-                    }}
-                    label="Select State"
-                    variant="outlined"
-                  />
-                );
-              }}
-            />
-          </Grid>
-          <Grid item xs={12} sm={12} md={6} lg={4}>
-            <Autocomplete
-              value={stateObj.account.city}
-              onChange={(event, newValue) => {
-                onDropdownChangeHandler("city", newValue);
-              }}
-              getOptionLabel={(option) => option.name}
-              id="controllable-states-demo"
-              name="city"
-              options={cities}
-              margin="normal"
-              fullWidth
-              renderInput={(params) => {
-                return (
-                  <TextField
-                    {...params}
-                    name="city"
-                    error={!stateObj.error.city.errorObject.isValid}
-                    helperText={stateObj.error.city.errorObject.errorMessage}
-                    margin="normal"
-                    inputProps={{
-                      ...params.inputProps,
-                      autoComplete: "new-password", // disable autocomplete and autofill
-                    }}
-                    fullWidth
-                    InputLabelProps={{
-                      shrink: true,
-                    }}
-                    label="Select City"
-                    variant="outlined"
-                  />
-                );
-              }}
-            />
-          </Grid>
+        <Grid item xs={12} sm={12} md={6} lg={4}>
+          <Autocomplete
+            value={stateObj.account.country}
+            onChange={(event, newValue) => {
+              onDropdownChangeHandler("country", newValue);
+            }}
+            getOptionLabel={(option) => {
+              return option.name;
+            }}
+            id="controllable-states-demo"
+            name="country"
+            options={countries}
+            margin="normal"
+            fullWidth
+            renderInput={(params) => {
+              return (
+                <TextField
+                  {...params}
+                  error={!stateObj.error.country.errorObject.isValid}
+                  helperText={stateObj.error.country.errorObject.errorMessage}
+                  name="country"
+                  margin="normal"
+                  inputProps={{
+                    ...params.inputProps,
+                    autoComplete: "new-password", // disable autocomplete and autofill
+                  }}
+                  fullWidth
+                  InputLabelProps={{
+                    shrink: true,
+                  }}
+                  label="Select Country"
+                  variant="outlined"
+                />
+              );
+            }}
+          />
+        </Grid>
 
-          <Grid item xs={12} sm={12} md={6} lg={4}>
-            <TextField
-              variant="outlined"
-              margin="normal"
-              fullWidth
-              id="zipCode"
-              label="ZIP Code."
-              name="zipCode"
-              InputLabelProps={{
-                shrink: true,
-              }}
-              InputProps={{
-                inputComponent: NumberFormatCustom,
-              }}
-              inputProps={{
-                maxLength: 6,
-              }}
-              error={!stateObj.error.zipCode.errorObject.isValid}
-              helperText={stateObj.error.zipCode.errorObject.errorMessage}
-              onChange={changeHandler}
-            />
-          </Grid>
-          </Grid> 
-          <Grid container spacing={2}>
-          <Grid item xs={12} sm={12} md={6} lg={4}>
+        <Grid item xs={12} sm={12} md={6} lg={4}>
+          <Autocomplete
+            value={stateObj.account.state}
+            onChange={(event, newValue) => {
+              onDropdownChangeHandler("state", newValue);
+            }}
+            getOptionLabel={(option) => option.name}
+            id="controllable-states-demo"
+            name="state"
+            options={states}
+            margin="normal"
+            fullWidth
+            renderInput={(params) => {
+              return (
+                <TextField
+                  {...params}
+                  error={!stateObj.error.state.errorObject.isValid}
+                  helperText={stateObj.error.state.errorObject.errorMessage}
+                  name="state"
+                  margin="normal"
+                  inputProps={{
+                    ...params.inputProps,
+                    autoComplete: "new-password", // disable autocomplete and autofill
+                  }}
+                  fullWidth
+                  InputLabelProps={{
+                    shrink: true,
+                  }}
+                  label="Select State"
+                  variant="outlined"
+                />
+              );
+            }}
+          />
+        </Grid>
+        <Grid item xs={12} sm={12} md={6} lg={4}>
+          <Autocomplete
+            value={stateObj.account.city}
+            onChange={(event, newValue) => {
+              onDropdownChangeHandler("city", newValue);
+            }}
+            getOptionLabel={(option) => option.name}
+            id="controllable-states-demo"
+            name="city"
+            options={cities}
+            margin="normal"
+            fullWidth
+            renderInput={(params) => {
+              return (
+                <TextField
+                  {...params}
+                  name="city"
+                  error={!stateObj.error.city.errorObject.isValid}
+                  helperText={stateObj.error.city.errorObject.errorMessage}
+                  margin="normal"
+                  inputProps={{
+                    ...params.inputProps,
+                    autoComplete: "new-password", // disable autocomplete and autofill
+                  }}
+                  fullWidth
+                  InputLabelProps={{
+                    shrink: true,
+                  }}
+                  label="Select City"
+                  variant="outlined"
+                />
+              );
+            }}
+          />
+        </Grid>
+
+        <Grid item xs={12} sm={12} md={6} lg={4}>
+          <TextField
+            variant="outlined"
+            margin="normal"
+            fullWidth
+            id="zipCode"
+            label="ZIP Code."
+            name="zipCode"
+            InputLabelProps={{
+              shrink: true,
+            }}
+            InputProps={{
+              inputComponent: NumberFormatCustom,
+            }}
+            inputProps={{
+              maxLength: 6,
+            }}
+            error={!stateObj.error.zipCode.errorObject.isValid}
+            helperText={stateObj.error.zipCode.errorObject.errorMessage}
+            onChange={changeHandler}
+          />
+        </Grid>
+
+        <Grid item xs={12} sm={12} md={6} lg={4}>
           <TextField
             variant="outlined"
             margin="normal"
@@ -690,8 +739,8 @@ export default function AddProject(props) {
             name="projectDescription"
             //placeholder="Description"
             multiline
-            rows={4}
-            rowsMax={4}
+            minRows={4}
+            maxRows={4}
             error={!stateObj.error.projectDescription.errorObject.isValid}
             helperText={
               stateObj.error.projectDescription.errorObject.errorMessage
@@ -701,12 +750,12 @@ export default function AddProject(props) {
               shrink: true,
             }}
             inputProps={{
-                maxLength: 500,
+              maxLength: 500,
             }}
           />
         </Grid>
-   </Grid>
-  
+      </Grid>
+
 
 
       <Grid container>
@@ -737,7 +786,7 @@ export default function AddProject(props) {
           </Button>
         </Grid>
       </Grid>
-      <CustomizedSnackbars open={snackbar} closeSnackbar={closeSnackbar} message={message}/>
-      </React.Fragment>
+      <CustomizedSnackbars open={snackbar} closeSnackbar={closeSnackbar} message={message} />
+    </React.Fragment>
   );
 }

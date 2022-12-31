@@ -34,6 +34,7 @@ import { VendorTabsName } from "../ManageUsers/EmployeeTabs/EmployeeTabsDetails"
 import KeyboardArrowUpIcon from "@material-ui/icons/KeyboardArrowUp";
 import KeyboardArrowDownIcon from "@material-ui/icons/KeyboardArrowDown";
 import moment from "moment";
+import EditVendor from "./EditVendor";
 const useStyles1 = makeStyles((theme) => ({
   root: {
     flexShrink: 0,
@@ -137,6 +138,8 @@ export default function ManageVendor() {
   const [take, setTake] = React.useState(5);
   const [skip, setSkip] = React.useState(0);
   const [totalRecords, setTotalRecords] = React.useState(0);
+  const [editPoup, setEditPopup] = React.useState(false);
+  const [editVendorId, seteditVendorId] = React.useState(0);
   const openExpansionAndSetVendorId = (rowIndex, vendorId) => {
     if (selectedRowIndex === rowIndex) {
       rowIndex = -1;
@@ -151,7 +154,11 @@ export default function ManageVendor() {
     setProjectName(name);
     setDeleteId(id);
   };
-
+  const handleClickEditOpen = (id, name) => {
+    //setProjectName(name);
+    seteditVendorId(id);
+    setEditPopup(true);
+  };
   const deleteProject = () => {
     httpService
       .delete(`${API_PATH.DELETE_VENDOR}${deleteId}`)
@@ -203,10 +210,7 @@ export default function ManageVendor() {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
   };
-  const tableObj = [{ title: "Project Name", proopName: "project_name" }];
-
-  console.log(rows);
-  return rows === null ? (
+   return rows === null ? (
     <LoadingPage></LoadingPage>
   ) : (
     <div>
@@ -309,7 +313,7 @@ export default function ManageVendor() {
                           <FontAwesomeIcon icon={faTrash} />
                         </IconButton>
                         <IconButton aria-label="edit row" size="small">
-                          <FontAwesomeIcon icon={faEdit} />
+                          <FontAwesomeIcon icon={faEdit} onClick={() => handleClickEditOpen(row.id, row.name)} />
                         </IconButton>
                       </TableCell>
 
@@ -443,6 +447,9 @@ export default function ManageVendor() {
         submitHandlePopup={deleteProject}
         deleteName={projectName}
       ></ModalPopup>
+       {editPoup === true &&
+        <EditVendor vendorId={editVendorId} />
+      }
     </div>
   );
 }

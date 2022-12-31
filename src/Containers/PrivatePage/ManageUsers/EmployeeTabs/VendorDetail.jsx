@@ -26,7 +26,8 @@ const VendorDetail = ({ vendorId }) => {
             return (
               <TabColumns
                 key={index}
-                value={key2 ? vendorDetail[key][key2] : vendorDetail[key]}
+                value={vendorDetail[key] ? (key2 ? vendorDetail[key][key2] : vendorDetail[key]) : ""}
+
                 label={label}
               />
             );

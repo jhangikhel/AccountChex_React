@@ -22,9 +22,10 @@ import CreateVendor from './Containers/PrivatePage/Vendor/CreateVendor';
 import ManageTimesheet from "./Containers/PrivatePage/Timesheet/ManageTimesheet";
 import CreateTimesheet from "./Containers/PrivatePage/Timesheet/CreateTimesheet";
 import ManageAccount from "./Containers/PrivatePage/Admin/ManageAcount";
-
+import CreateRole from "./Containers/PrivatePage/Role/CreateRole/CreateRole";
+import CreateUser from "./Containers/PrivatePage/Users/CreateUser/Index";
 class App extends Component {
- 
+
   render() {
 
     return (
@@ -40,6 +41,10 @@ class App extends Component {
             <WithPrivate
               path="/manageaccount"
               component={ManageAccount}
+            ></WithPrivate>
+            <WithPrivate
+              path={PAGE_PATH.createRole}
+              component={CreateRole}
             ></WithPrivate>
             <WithPrivate
               path="/manageemployee"
@@ -81,7 +86,10 @@ class App extends Component {
               path="/createvendor"
               component={CreateVendor}
             ></WithPrivate>
-           
+            <WithPrivate
+              path={PAGE_PATH.createUser}
+              component={CreateUser}
+            ></WithPrivate>
             <WithPrivate
               path="/changepassword"
               component={ChangePassword}
