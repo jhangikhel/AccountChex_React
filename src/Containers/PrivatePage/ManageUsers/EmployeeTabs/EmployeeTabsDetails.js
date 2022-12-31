@@ -47,7 +47,7 @@ export const EmployeeDetailTabsKey = [
 ];
 export const VendorDetailTabsKey = [
   { key: "parent", key2: "name", value: "", label: "Parent Vendor" },
-  {
+   {
     key: "name",
     value: "",
     label: "Name",
@@ -58,13 +58,7 @@ export const VendorDetailTabsKey = [
   { key: "address1", value: "", label: "Address 1" },
   { key: "address2", value: "", label: "Address 2" },
   { key: "emailId", value: "", label: "Email Id" },
-  { key: "websiteUrl", value: "", label: "URL" },
-  /* 
-   
-    
-    { key: 'board_numer', value: '', label: "Client ID" },
-   
-     */
+  { key: "websiteUrl", value: "", label: "URL" }
 ];
 export const ClientDetailTabsKey = [
   {
@@ -72,15 +66,17 @@ export const ClientDetailTabsKey = [
     value: "",
     label: "Name",
   },
-  { key: "email_id", value: "", label: "Email Id" },
-  { key: "vendor_1", value: "", label: "Vendor Tier 1" },
-  { key: "vendor_2", value: "", label: "Vendor Tier 2" },
-  { key: "website_url", value: "", label: "Website URL" },
-  { key: "address_1", value: "", label: "Address 1" },
-  { key: "address_2", value: "", label: "Address 2" },
-  { key: "city", value: "", label: "City" },
-  { key: "state", value: "", label: "State" },
-  { key: "country", value: "", label: "Country" },
+  { key: "emailId", value: "", label: "Email Id" },
+  { key: "boardNumber", value: "", label: "Board Number" },
+  { key: "vendor", key2: "name", value: "", label: "Vendor" },
+  { key: "websiteUrl", value: "", label: "Website URL" },
+  { key: "address1", value: "", label: "Address 1" },
+  { key: "address2", value: "", label: "Address 2" },
+  { key: "city",  key2: "name", value: "", label: "City" },
+  { key: "state", key2: "name",  value: "", label: "State" },
+  { key: "country", key2: "name",  value: "", label: "Country" },
+  { key: "account", key2: "name",  value: "", label: "Account" },
+  
 ];
 export const ProjectDetailTabsKey = [
   {

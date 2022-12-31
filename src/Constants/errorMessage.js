@@ -62,7 +62,20 @@ export const errorMessage = {
     accountType: `${ddlMsg}Account Type`,
     biilingDate: `${ddlMsg}Billing Date`,
     frequency: `${ddlMsg}Frequency`,
-    taxId: `${txtBoxMsg}Tax Id`
+    taxId: `${txtBoxMsg}Tax Id`,
+    clientName: `${txtBoxMsg}Client Name`,
+    address1Minlength:"Address should be of minimum length",
+    billingPrice:`${txtBoxMsg}Billing Price`,
+    billingPriceNegative: 'Billing Price never be negative',
+    billingPriceMinlength: "Billing Price should be of minimum ",
+    account:`${ddlMsg}Account`,
+    userName:`${txtBoxMsg}User Name`,
+    userNameMinlength:"User Name should be of minimum length",
+    primaryPhone:`${txtBoxMsg}Contact Number`,
+    primaryPhoneMinlength:"Contact Number should be of minimum length",
+    confirmEmail: `${txtBoxMsg}Confirm Email Id`,
+    confirmEmailInValid: 'Confirm Email Id is not Valid',
+    role:`${ddlMsg}Role`,
 }
 
 export const confirmationPopupMessages = {

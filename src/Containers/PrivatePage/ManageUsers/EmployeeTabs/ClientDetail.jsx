@@ -14,7 +14,7 @@ const ClientDetail = ({ clientId }) => {
     useEffect(() => {
         const apiPath = fillTemp(clientId);
         httpService.get(apiPath).then((res) => {
-            setclientDetail(res.data[0]);
+            setclientDetail(res.data);
         });
     }, [clientId])
     return (
@@ -22,8 +22,8 @@ const ClientDetail = ({ clientId }) => {
             {clientDetail ?
                 <Grid container spacing={4}>
                     {
-                        ClientDetailTabsKey.map(({ key, label }, index) => {
-                            return <TabColumns key={index} value={clientDetail[key]} label={label} />
+                        ClientDetailTabsKey.map(({ key, label,key2 }, index) => {
+                            return <TabColumns key={index[key2]}  value={key2 ? clientDetail[key][key2] : clientDetail[key]} label={label} />
                         })
                     }
                 </Grid>

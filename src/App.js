@@ -23,7 +23,7 @@ import ManageTimesheet from "./Containers/PrivatePage/Timesheet/ManageTimesheet"
 import CreateTimesheet from "./Containers/PrivatePage/Timesheet/CreateTimesheet";
 import ManageAccount from "./Containers/PrivatePage/Admin/ManageAcount";
 import CreateRole from "./Containers/PrivatePage/Role/CreateRole/CreateRole";
-import CreateUser from "./Containers/PrivatePage/Users/CreateUser/CreateUser";
+import CreateUser from "./Containers/PrivatePage/Users/CreateUser/Index";
 class App extends Component {
 
   render() {

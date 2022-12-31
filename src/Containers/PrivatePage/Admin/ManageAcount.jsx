@@ -25,7 +25,12 @@ const ManageAccount = () => {
     const [accountManagers, setAccountManagers] = useState([]);
     const [clients, setClients] = useState([]);
     const [message, setMessage] = React.useState(snackbarMessages.createSuccess);
-
+    const [currencies, setCurrencies] = useState([]);
+    const [accountTypes, setAccountTypes] = useState([]);
+    const [organiztionTypes, setOrganiztionTypes] = useState([]);
+    const [frequencies, setFrequencies] = useState([]);
+    const [parentAccounts, setParentAccounts] = useState([]);
+    const [billingDates, setBillingDates] = useState([]);
     const [stateObj, setError] = useState({
         error: {
             accountName: {
@@ -78,7 +83,7 @@ const ManageAccount = () => {
                     isDropdown: true,
                 },
             },
-            biilingDate: {
+            billingDate: {
                 errorObject: {
                     required: true,
                     isValid: true,
@@ -127,7 +132,25 @@ const ManageAccount = () => {
                     minLength: 6,
                     errorMessage: "",
                 },
-            }
+            },
+            noOfUsers: {
+                errorObject: {
+                    required: true,
+                    isValid: true,
+                    isNumeric: true,
+                    minLength: 1,
+                    errorMessage: "",
+                },
+            },
+            billingPrice: {
+                errorObject: {
+                    required: true,
+                    isValid: true,
+                    isNumeric: true,
+                    minLength: 2,
+                    errorMessage: "",
+                },
+            },
         },
         account: {
             parentAccount: null,
@@ -136,37 +159,47 @@ const ManageAccount = () => {
             billingContactNumber: "",
             billingAddress: "",
             billingPrimayEmail: "",
-            billingSecondaryEmail:"",
+            billingSecondaryEmail: "",
             country: null,
             currency: null,
             state: null,
             city: null,
             zipCode: "",
             accountType: null,
-            biilingDate: null,
+            billingDate: null,
             frequency: null,
-            taxId: ""
+            taxId: "",
+            billingFlag: 1,
+            noOfUsers: "",
+            billingPrice: ""
         },
     });
 
-    const accountId = 1;
-    let fillTemp1 = fillTemplate(API_PATH.GET_CLIENTS, "organizationId");
+
 
     useEffect(() => {
-        const apiPath1 = fillTemp1(accountId);
+
         httpService
             .all([
                 httpService.get(API_PATH.GET_COUNTRY),
-                httpService.get(API_PATH.GET_VENDOR + accountId),
-                httpService.get(API_PATH.GET_MANAGER),
-                httpService.get(apiPath1)
+                httpService.get(API_PATH.GET_CURRENCY),
+                httpService.get(API_PATH.GET_ORGANIZATION),
+                httpService.get(API_PATH.GET_FREQUENCY),
+                httpService.get(API_PATH.GET_ACCOUNTTYPE),
+                httpService.get(API_PATH.GET_PARENTACCOUNT),
+                httpService.get(API_PATH.GET_BILLING_DATES),
+
             ])
             .then((responses) => {
-                const [countries, vendors, managers, clients] = responses;
+                const [countries, currency, organization, frequency, accountType, parentAccount, biilings] = responses;
                 setCountries(countries.data);
-                setVendors(vendors.data)
-                setAccountManagers(managers.data);
-                setClients(clients.data)
+                setCurrencies(currency.data);
+                setOrganiztionTypes(organization.data);
+                setFrequencies(frequency.data);
+                setAccountTypes(accountType.data);
+                setParentAccounts(parentAccount.data);
+                setBillingDates(biilings.data)
+                console.log(biilings);
             });
     }, []);
     const getStates = (countryId) => {
@@ -231,32 +264,36 @@ const ManageAccount = () => {
         setError({ account, error: error });
 
         if (result === true) {
-
-
-            httpService.post(API_PATH.CREATE_PROJECT, {
-                accountName: account.accountName,
-                projectDescription: account.projectDescription,
+            httpService.post(API_PATH.CREATE_ACCOUNT, {
+                name: account.accountName,
                 organizationType: account.organizationType.id,
-                parentAccount: account.parentAccount.id,
-                vendor2: account.vendorsTier2,
-                clientId: account.client.id,
-                startDate: new Date(account.startDate).getTime(),
-                endDate: new Date(account.endDate).getTime(),
-                workAddress: account.workAddress,
-                city: account.city.id,
-                state: account.state.id,
-                country: account.country.id,
+                accountType: account.accountType.id,
+                billingFlag: account.billingFlag,
+                billingDate: account.billingDate.id,
+                frequency: account.frequency.id,
+                taxId: account.taxId,
                 currency: account.currency.id,
-                zipCode: account.zipCode
+                billingContactNumber: account.billingContactNumber,
+                billingAddress: account.billingAddress,
+                billingPrimaryEmail: account.billingPrimayEmail,
+                billingSecondaryEmail: account.billingSecondaryEmail,
+                parentAccountId: account.parentAccount.id,
+                cityId: account.city.id,
+                stateId: account.state.id,
+                countryId: account.country.id,
+                currency: account.currency.id,
+                zipCode: account.zipCode,
+                noOfUsers: account.noOfUsers,
+                billingPrice: account.billingPrice,
+                level: account.parentAccount.level + 1
             }).then((res) => {
-                setMessage(res.data[0].msg);
-                setSnackbar(true);
-                setTimeout(() => {
-                    if (res.data[0].status === 1) {
-                        history.push('/manageproject');
-                    }
-                }, 1000)
-
+                if (res.status === 201) {
+                    setMessage(snackbarMessages.createSuccess);
+                    setSnackbar(true);
+                    setTimeout(() => {
+                        history.push('/manageclient');
+                    }, 1000)
+                }
             }).catch(err => {
                 setMessage(snackbarMessages.createError);
                 setSnackbar(true);
@@ -281,7 +318,7 @@ const ManageAccount = () => {
                         }}
                         id="controllable-states-demo"
                         name="parentAccount"
-                        options={vendors}
+                        options={parentAccounts}
                         margin="normal"
                         fullWidth
 
@@ -339,11 +376,11 @@ const ManageAccount = () => {
                             onDropdownChangeHandler("organizationType", newValue);
                         }}
                         getOptionLabel={(option) => {
-                            return option.account_manager;
+                            return option.long_name;
                         }}
                         id="controllable-states-demo"
                         name="organizationType"
-                        options={accountManagers}
+                        options={organiztionTypes}
                         margin="normal"
                         fullWidth
                         renderInput={(params) => {
@@ -381,11 +418,11 @@ const ManageAccount = () => {
                             onDropdownChangeHandler("accountType", newValue);
                         }}
                         getOptionLabel={(option) => {
-                            return option.alias;
+                            return option.long_name;
                         }}
                         id="controllable-states-demo"
                         name="accountType"
-                        options={countries}
+                        options={accountTypes}
                         margin="normal"
                         fullWidth
                         renderInput={(params) => {
@@ -418,34 +455,41 @@ const ManageAccount = () => {
                         aria-label="TEST"
                         aria-labelledby="demo-controlled-radio-buttons-group"
                         name="controlled-radio-buttons-group"
-                    //value={value}
-                    //onChange={handleChange}
+                        value={stateObj.account.billingFlag}
+                        onChange={(_e, value) => {
+                            const { account } = stateObj;
+
+                            setError({
+                                ...stateObj,
+                                account: { ...account, billingFlag: +value },
+                            });
+                        }}
                     >
-                        <FormControlLabel value="yes" control={<Radio />} label="Yes" />
-                        <FormControlLabel value="no" control={<Radio />} label="No" />
+                        <FormControlLabel value={1} control={<Radio />} label="Yes" />
+                        <FormControlLabel value={0} control={<Radio />} label="No" />
                     </RadioGroup>
                 </Grid>
                 <Grid item xs={12} sm={12} md={6} lg={4}>
                     <Autocomplete
-                        value={stateObj.account.biilingDate}
+                        value={stateObj.account.billingDate}
                         onChange={(event, newValue) => {
-                            onDropdownChangeHandler("biilingDate", newValue);
+                            onDropdownChangeHandler("billingDate", newValue);
                         }}
                         getOptionLabel={(option) => {
-                            return option.alias;
+                            return option.long_name;
                         }}
                         id="controllable-states-demo"
-                        name="biilingDate"
-                        options={countries}
+                        name="billingDate"
+                        options={billingDates}
                         margin="normal"
                         fullWidth
                         renderInput={(params) => {
                             return (
                                 <TextField
                                     {...params}
-                                    error={!stateObj.error.biilingDate.errorObject.isValid}
-                                    helperText={stateObj.error.biilingDate.errorObject.errorMessage}
-                                    name="biilingDate"
+                                    error={!stateObj.error.billingDate.errorObject.isValid}
+                                    helperText={stateObj.error.billingDate.errorObject.errorMessage}
+                                    name="billingDate"
                                     margin="normal"
                                     inputProps={{
                                         ...params.inputProps,
@@ -470,11 +514,11 @@ const ManageAccount = () => {
                             onDropdownChangeHandler("frequency", newValue);
                         }}
                         getOptionLabel={(option) => {
-                            return option.alias;
+                            return option.long_name;
                         }}
                         id="controllable-states-demo"
                         name="frequency"
-                        options={countries}
+                        options={frequencies}
                         margin="normal"
                         fullWidth
                         renderInput={(params) => {
@@ -530,11 +574,11 @@ const ManageAccount = () => {
                             onDropdownChangeHandler("currency", newValue);
                         }}
                         getOptionLabel={(option) => {
-                            return option.alias;
+                            return `${option.long_name} (${option.short_name})`;
                         }}
                         id="controllable-states-demo"
                         name="currency"
-                        options={countries}
+                        options={currencies}
                         margin="normal"
                         fullWidth
                         renderInput={(params) => {
@@ -567,7 +611,7 @@ const ManageAccount = () => {
                         fullWidth
                         id="billingContactNumber"
                         label="Billing Contact Number"
-                        name="taxId"
+                        name="billingContactNumber"
                         error={!stateObj.error.billingContactNumber.errorObject.isValid}
                         helperText={
                             stateObj.error.billingContactNumber.errorObject.errorMessage
@@ -657,7 +701,7 @@ const ManageAccount = () => {
                             onDropdownChangeHandler("country", newValue);
                         }}
                         getOptionLabel={(option) => {
-                            return option.alias;
+                            return option.name;
                         }}
                         id="controllable-states-demo"
                         name="country"
@@ -780,6 +824,50 @@ const ManageAccount = () => {
                         }}
                         error={!stateObj.error.zipCode.errorObject.isValid}
                         helperText={stateObj.error.zipCode.errorObject.errorMessage}
+                        onChange={changeHandler}
+                    />
+                </Grid>
+                <Grid item xs={12} sm={12} md={6} lg={4}>
+                    <TextField
+                        variant="outlined"
+                        margin="normal"
+                        fullWidth
+                        id="noOfUsers"
+                        label="No. Of Users"
+                        name="noOfUsers"
+                        InputLabelProps={{
+                            shrink: true,
+                        }}
+                        InputProps={{
+                            inputComponent: NumberFormatCustom,
+                        }}
+                        inputProps={{
+                            maxLength: 6,
+                        }}
+                        error={!stateObj.error.noOfUsers.errorObject.isValid}
+                        helperText={stateObj.error.noOfUsers.errorObject.errorMessage}
+                        onChange={changeHandler}
+                    />
+                </Grid>
+                <Grid item xs={12} sm={12} md={6} lg={4}>
+                    <TextField
+                        variant="outlined"
+                        margin="normal"
+                        fullWidth
+                        id="billingPrice"
+                        label="Billing Price"
+                        name="billingPrice"
+                        InputLabelProps={{
+                            shrink: true,
+                        }}
+                        InputProps={{
+                            inputComponent: NumberFormatCustom,
+                        }}
+                        inputProps={{
+                            maxLength: 6,
+                        }}
+                        error={!stateObj.error.billingPrice.errorObject.isValid}
+                        helperText={stateObj.error.billingPrice.errorObject.errorMessage}
                         onChange={changeHandler}
                     />
                 </Grid>

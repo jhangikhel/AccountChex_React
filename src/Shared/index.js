@@ -2,7 +2,7 @@ import { errorMessage } from './../Constants/errorMessage';
 import { emailRegularExp, urlRegularExp, PAGE_PATH, PAGE_NAME } from './../Constants/config';
 import moment from 'moment';
 export function checkValidity(value, name, rules) {
-
+console.log("NAME", name);
     let isValid = false;
     const { errorObject } = rules;
     let errorMsg = "";
@@ -35,7 +35,7 @@ export function checkValidity(value, name, rules) {
     else {
         if (errorObject.required) {
             if (errorObject.isNumeric) {
-
+                console.log("VALUE", value, isNaN(value), name);
                 if (isNaN(value)) {
 
                     isValid = false;
@@ -96,9 +96,9 @@ export const fillTemplate = function (templateString, templateVars) {
 export const menuBar = [
     //{id:1,pageName:PAGE_NAME.dashboard,pagePath:PAGE_PATH.dashboard},
     { id: 2, pageName: PAGE_NAME.createEmployee, pagePath: PAGE_PATH.createEmployee, isMenuBar: true },
-    { id: 3, pageName: PAGE_NAME.createProject, pagePath: PAGE_PATH.createProject, isMenuBar: true },
+    { id: 3, pageName: PAGE_NAME.project, pagePath: PAGE_PATH.project, isMenuBar: true },
     { id: 4, pageName: PAGE_NAME.vendor, pagePath: PAGE_PATH.vendor, isMenuBar: true },
-    { id: 5, pageName: PAGE_NAME.createClient, pagePath: PAGE_PATH.createClient, isMenuBar: true },
+    { id: 5, pageName: PAGE_NAME.client, pagePath: PAGE_PATH.client, isMenuBar: true },
     { id: 10, pageName: PAGE_NAME.createTimesheet, pagePath: PAGE_PATH.createTimesheet, isMenuBar: true },
     { id: 11, pageName: PAGE_NAME.createTimesheet, pagePath: PAGE_PATH.createTimesheet, isMenuBar: false },
     { id: 6, pageName: PAGE_NAME.createProject, pagePath: PAGE_PATH.createProject, isMenuBar: false },
